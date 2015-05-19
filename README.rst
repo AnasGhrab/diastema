@@ -35,6 +35,9 @@ For now, it's main features are :
 Installation
 ============
 
+	git clone https://github.com/AnasGhrab/Diastema
+	python setup.py install
+
 You need to install manually Essentia (http://essentia.upf.edu/)
 
 Contact
