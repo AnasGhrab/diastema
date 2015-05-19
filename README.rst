@@ -25,6 +25,8 @@ Then, install Diastema with the following :
 	
 	pip install diastema
 
+Or :
+
 .. code:: python
 
 	git clone https://github.com/AnasGhrab/diastema
