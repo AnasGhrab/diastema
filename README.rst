@@ -17,7 +17,7 @@ For now, it's main features are :
 Installation
 ============
 
-To install Diastema
+First, you need to install manually Essentia (http://essentia.upf.edu/). The install Diastema
 
 .. code:: python
 
@@ -26,6 +26,24 @@ To install Diastema
 
 You need to install manually Essentia (http://essentia.upf.edu/)
 
+Usage
+=====
+
+To use Diastema :
+
+.. code:: python
+
+	from distema import *
+	path = "path/to/a/folder/with/audios/wav/files"
+	Music = Melodies(path)
+	
+Then you can
+
+.. code:: python
+
+	Music.PdfsPlot()
+	Music.Simatrix()
+		
 Contact
 =======
 
