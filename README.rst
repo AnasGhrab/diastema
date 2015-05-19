@@ -22,6 +22,10 @@ First, you need to install manually **Essentia** (http://essentia.upf.edu/).
 Then, install Diastema with the following :
 
 .. code:: python
+	
+	pip install diastema
+
+.. code:: python
 
 	git clone https://github.com/AnasGhrab/diastema
 	python setup.py install
