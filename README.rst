@@ -23,7 +23,7 @@ Diastema: Musical intervals and modality analysis
 Overview
 ========
 
-**Diastema**, is a project to analyse musical modality.
+**Diastema**, is a project to analyse musical modality. It uses Python2.
 
 For now, it's main features are :
 
@@ -35,6 +35,7 @@ For now, it's main features are :
 Installation
 ============
 
+To install Diastema::
 	git clone https://github.com/AnasGhrab/Diastema
 	python setup.py install
 
