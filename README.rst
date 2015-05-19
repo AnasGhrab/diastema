@@ -9,7 +9,7 @@ Overview
 
 For now, it's main features are :
 
-* Fondamental frequencies extraction (using _PredominentMelody()_ from **Essentia**);
+* Fondamental frequencies extraction (using *PredominentMelody()* from **Essentia**);
 * Getting the main frequencies as peaks of the probability density function from frequencies;
 * Comparing PDFs using a correlation coefficient;
 * Getting a similarity matrix between melodies.
@@ -17,9 +17,9 @@ For now, it's main features are :
 Installation
 ============
 
-First, you need to install manually Essentia (http://essentia.upf.edu/).
+First, you need to install manually **Essentia** (http://essentia.upf.edu/).
 
-Thenm, install Diastema with the following
+Then, install Diastema with the following :
 
 .. code:: python
 
@@ -35,7 +35,7 @@ To use Diastema :
 .. code:: python
 
 	from distema import *
-	path = "path/to/a/folder/with/audios/wav/files"
+	path = "path/to/a/folder/with/audios/wav/files/"
 	Music = Melodies(path)
 	
 Then you can
