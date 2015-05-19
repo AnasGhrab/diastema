@@ -17,14 +17,15 @@ For now, it's main features are :
 Installation
 ============
 
-First, you need to install manually Essentia (http://essentia.upf.edu/). The install Diastema
+First, you need to install manually Essentia (http://essentia.upf.edu/).
+
+Thenm, install Diastema with the following
 
 .. code:: python
 
 	git clone https://github.com/AnasGhrab/Diastema
 	python setup.py install
 
-You need to install manually Essentia (http://essentia.upf.edu/)
 
 Usage
 =====
