@@ -9,7 +9,7 @@ Overview
 
 For now, it's main features are :
 
-* Fondamental frequencies extraction (using _PredominentMelody()_ from **Essentia**);
+* Fondamental frequencies extraction (using *PredominentMelody()* from **Essentia**);
 * Getting the main frequencies as peaks of the probability density function from frequencies;
 * Comparing PDFs using a correlation coefficient;
 * Getting a similarity matrix between melodies.
