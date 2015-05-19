@@ -2,24 +2,6 @@
 Diastema: Musical intervals and modality analysis
 =================================================
 
-|version| |downloads| |travis_master| |coverage_master|
-
-.. |travis_master| image:: https://secure.travis-ci.org/Parisson/Telemeta.png?branch=master
-   :target: https://travis-ci.org/Parisson/Telemeta/
-   :alt: Travis
-
-.. |version| image:: https://pypip.in/version/Telemeta/badge.png
-   :target: https://pypi.python.org/pypi/Telemeta/
-   :alt: Version
-
-.. |downloads| image:: https://pypip.in/download/Telemeta/badge.svg
-   :target: https://pypi.python.org/pypi/Telemeta/
-   :alt: Downloads
-
-.. |coverage_master| image:: https://coveralls.io/repos/Parisson/Telemeta/badge.png?branch=master
-   :target: https://coveralls.io/r/Parisson/Telemeta?branch=master
-   :alt: Coverage
-
 Overview
 ========
 
@@ -35,7 +17,10 @@ For now, it's main features are :
 Installation
 ============
 
-To install Diastema::
+To install Diastema
+
+.. code:: python
+
 	git clone https://github.com/AnasGhrab/Diastema
 	python setup.py install
 
