@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 #from scipy import stats
 #from scipy import signal
 from scipy.stats.kde import gaussian_kde
+from scipy.stats.mstats import mode
+
 import glob, os.path, time, os
 
 from essentia import *  # Importer toutes les fonctions de la bibliotheque Essentia
@@ -23,11 +25,13 @@ class Melodie(object):
 		self.file_name = os.path.split(self.file_path)[1]
 		self.file_label = self.file_name.split(".")[0]
 		self.file_exten = self.file_name.split(".")[1]
+		self.freqref = 500
 
 		if self.file_exten == 'txt':
 			self.frequences = numpy.loadtxt(file)
 			self.freq = self.frequences[~numpy.isnan(self.frequences)]
-			self.pdf = gaussian_kde(self.frequences[~numpy.isnan(self.frequences)],bw_method=.1)
+			self.freqtransmode = self.transmode(self.freqref)
+			self.pdf = gaussian_kde(self.freqtransmode[~numpy.isnan(self.freqtransmode)],bw_method=.05)
 			self.fmin = min(self.freq)
 			self.fmax = max(self.freq)
 			self.fmean = numpy.mean(self.freq)
@@ -36,11 +40,7 @@ class Melodie(object):
 			self.pdf = self.pdf(self.x)
 			self.peaks()
 		if self.file_exten == 'wav':
-			start = time.time()
-			print start,' : Extraction des f0 de ',self.file_name
 			self.file_pitch_extract(self.file_path)
-			end = time.time()
-			print 'Fichier',self.file_label,'analyse (',end - start,') secondes'
 
 	def __str__(self):
 		return "File : %s" % (self.file_name)
@@ -49,13 +49,19 @@ class Melodie(object):
 		"""Extraction des frequences avec PredominantMelody()
 		Le resultat est un fichier .txt"""
 
-#		file = file.append('.wav')
+		start = time.time()
+		print start,' : Extraction des f0 de ',self.file_name
+
 		audio = MonoLoader(filename = file)() # creation de l'instance
 		melodie = PredominantMelody() # creation de l'instance
 		pitch, confidence = melodie(audio) 
 		pitch[pitch==0]=numpy.nan
 		nom_fichier = self.file_name.replace("wav", "txt");
 		numpy.savetxt(os.path.split(self.file_path)[0]+'/txt/'+nom_fichier,pitch,fmt='%1.3f')
+
+		end = time.time()
+		print 'Fichier',self.file_label,'analyse (',end - start,') secondes'
+
 		return
 	
 	def pdf(self, x):
@@ -101,12 +107,13 @@ class Melodie(object):
 
 		return self.peaks, self.peakspdf
 
-	def plot_peaks(self):
-		"""Annoter les peaks sur le dessin
+	def transmode(self,freqref):
+		"""Transpose all the frequencies by setting the mode on a given reference frequency
 
 		"""
-		# ax = fig.add_subplot(111)
-		
+		interv_transpo = mode(self.freq)[0]/freqref
+		self.freqtransposed = self.freq / interv_transpo
+		return self.freqtransposed
 
 class Melodies(object):
 	"""Une classe definissant un ensemble de melodies, leur degre d'homogeneite et de proximite
@@ -129,46 +136,19 @@ class Melodies(object):
 		self.melodies = []
 
 		if len(self.folder_txt) == len(self.folder_wav):
-			print 'Lecture et analyse de ',len(self.folder_wav),' fichiers (.txt) dans le dossier :'
+			print 'Lecture et analyse de ',len(self.folder_wav),' fichiers (.txt) dans le dossier :',self.path
 			for melodie in self.folder_txt:
 				self.melodies.append(Melodie(melodie))
-			self.Simatrix()
+			#self.Simatrix()
 		else:
 			print 'Analyse de ',len(self.folder_wav),' fichiers Audio (.wav) dans le dossier :'
 			for melodie in self.folder_wav:
 				self.melodies.append(Melodie(melodie))
+			for melodie in self.folder_txt:
+				self.melodies.append(Melodie(melodie))
 		
-	def PdfsPlot(self):
-		"""Dessine les PDFs de tous les fichiers
-
-		"""
-		plt.figure(figsize=(18, 12))
-		for melodie_pdf in self.melodies:
-			melodie_pdf.pdf_show()
-		return plt.show()
-	
-	def PdfCorr(self):
-		"""Cree la matrice des coefficients de correlation a partir des pdfs
-
-		"""
-		PDFS = []
-		for i in range(0,len(self.melodies)):
-		    PDFS.append(self.melodies[i].pdf)
-		PdfCorr = numpy.corrcoef(PDFS)
-		return PdfCorr
-
-	def Simatrix(self):
-		"""Cree la matrice des coefficients de correlation a partir des pdfs
-
-		"""
-		R = self.PdfCorr()
-		l = len(self.PdfCorr())
-		plt.pcolor(R)
-		plt.colorbar()
-		plt.yticks(numpy.arange(0.5,l+0.5),range(1,l+1))
-		plt.xticks(numpy.arange(0.5,l+0.5),range(1,l+1))
-		return plt.show()
-
+		self.PdfCorr()
+		
 	def pitch_extract(self):
 		"""Extrait les frequences f0 des tous les fichiers .wav du dossier"""
 
@@ -177,3 +157,52 @@ class Melodies(object):
 		for fichier_audio in self.melodies:
 			self.file_pitch_extract(fichier_audio)
 		return
+
+	def PdfCorr(self):
+		"""Cree la matrice des coefficients de correlation a partir des pdfs, classe sur la premiere colonne
+
+		"""
+		PDFS = []
+		for i in range(0,len(self.melodies)):
+		    PDFS.append(self.melodies[i].pdf)
+		self.PdfCorr = numpy.corrcoef(PDFS)
+		return self.PdfCorr
+
+	def PdfsPlot(self):
+		"""Dessine les PDFs de tous les fichiers
+
+		"""
+		plt.figure(figsize=(18, 12))
+		for melodie_pdf in self.melodies:
+			melodie_pdf.pdf_show()
+		return plt.show()
+
+	def Simatrix(self):
+		"""Cree la matrice des coefficients de correlation a partir des pdfs
+
+		"""
+		R = self.PdfCorr
+		l = len(self.PdfCorr)
+		plt.pcolor(R)
+		plt.colorbar()
+		plt.yticks(numpy.arange(0.5,l+0.5),range(1,l+1))
+		plt.xticks(numpy.arange(0.5,l+0.5),range(1,l+1))
+		return plt.show()
+
+	def SimPdf(self,i):
+		"""PDF des similarites, basee sur la melodie i
+
+		"""
+		#self.PdfCorr = self.PdfCorr[:, self.PdfCorr[i].argsort()]
+		PdfCorrI = self.PdfCorr[i]
+		b = gaussian_kde(PdfCorrI)
+		x = numpy.arange(0,1,0.001)
+		Y = b(x)
+		plt.plot(x,Y)
+
+	def SimPdfs(self):
+		"""PDFs des similarites, basee sur toutes les SimPdf
+
+		"""
+		for i in range(0,len(self.PdfCorr)):
+			self.SimPdf(i)
