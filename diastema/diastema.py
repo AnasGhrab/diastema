@@ -65,10 +65,18 @@ class Melodie(object):
 		return
 	
 	def pdf(self, x):
-		"""Estime la densite de probabilite
-
-		Output: nombre reel de densite de probabilite
 		"""
+		Estime la densite de probabilite
+
+		Parameters
+		----------
+		x : array_like
+
+		Returns
+		-------
+		y : array_like
+	    	Returns a ....
+	    """
 
 		return self.pdf.evaluate(x)
 
@@ -114,6 +122,34 @@ class Melodie(object):
 		interv_transpo = mode(self.freq)[0]/freqref
 		self.freqtransposed = self.freq / interv_transpo
 		return self.freqtransposed
+
+	def tonique(self,percent=8):
+		"""
+		Get the tonic frequency defined as the mode of the last frequencies array.
+		These as selected by the percent argument.
+		
+		Input :
+		-----------
+			percent : a percentage of the number of frames from the total size
+			of the frequencies array to give the last frequencies. Default percent= 8
+		
+		Output :
+		-----------
+
+			M : the mode
+			N : the mode converted inside an octave
+			Final_Freqs : the last frequencies according to the percentage
+		"""
+
+		L = len(self.freq)
+		Nb_Frames = L*percent/100
+		Final_Freqs = self.freq[(L-Nb_Frames):L]
+		M = mode(Final_Freqs)
+		if M[0] > mode(self.freq)[0]*2:
+			N = M[0]/2
+		if M[0] < mode(self.freq)[0]/2:
+			N = M[0]*2 
+		return M[0],N,Final_Freqs
 
 class Melodies(object):
 	"""Une classe definissant un ensemble de melodies, leur degre d'homogeneite et de proximite

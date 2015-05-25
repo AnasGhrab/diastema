@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='diastema',
-      version='0.0.1',
+      version='0.0.2',
       description='A tool for modal music analysis',
       url='https://github.com/AnasGhrab/diastema',
       author='Anas Ghrab',
