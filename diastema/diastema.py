@@ -159,7 +159,7 @@ class Melodie(object):
 				N = M[0]*2
 			else:
 				N = M[0]
-			return M[0],N.tolist(),Final_Freqs
+			return M[0],N.tolist()[0],Final_Freqs
 
 	def get_intervals(self,unit="savart"):
 		"""
@@ -212,7 +212,7 @@ class Melodies(object):
 			for melodie in self.folder_txt:
 				self.melodies.append(Melodie(melodie,xmin,xmax))
 		
-		self.PdfCorr
+		self.PdfCorr()
 		
 	def pitch_extract(self):
 		"""Extrait les frequences f0 des tous les fichiers .wav du dossier"""
