@@ -10,6 +10,8 @@ from essentia import *  # Importer toutes les fonctions de la bibliotheque Essen
 from essentia.standard import * # Importer toutes les fonctions du module **standard** de Essentia
 #from pandas import *
 
+numpy.set_printoptions(precision=4)
+
 class Melodie(object):
 	"""Une classe definissant une melodie et ses caracteristiques, a partir de la liste de ses frequences"""
 		
@@ -120,7 +122,7 @@ class Melodie(object):
 	# 	self.freqtransposed = self.freq / interv_transpo
 	# 	return self.freqtransposed
 
-	def tonique(self,percent=1.5,method="pdf"):
+	def tonique(self,percent=0.5,method="mode"):
 		"""
 		Get the tonic frequency defined as the mode of the last frequencies array.
 		These as selected by the percent argument. Two methods are possible : pdf or mode.
@@ -161,12 +163,14 @@ class Melodie(object):
 				N = M[0]
 			return M[0],N.tolist()[0],Final_Freqs
 
-	def get_intervals(self,unit="savart"):
+	def get_intervals(self,percent=0.5,method="mode",unit="savart"):
 		"""
 		Converts the frequencies into a linear space
 
 		Input :
 		-----------
+			percent (optional) : percent from the last frequencies to take in consideration. Default = 0.5%
+			method (optional) : Two available methods : _pdf_ and _mode_. Default = mode
 			unit (optional) : the Unit to use : savart of cent. Default = savart.
 		
 		Output :
@@ -175,9 +179,9 @@ class Melodie(object):
 		"""
 		self.intervals = []
 		if unit == "savart":
-			self.intervals = (numpy.log10(self.ordredpeaks[:,0]/self.tonique()[1]))*1000
+			self.intervals = (numpy.log10(self.ordredpeaks[:,0]/self.tonique(percent,method)[1]))*1000
 		if unit == "cent":
-			self.intervals = (numpy.log2(self.ordredpeaks[:,0]/self.tonique()[1]))*1200
+			self.intervals = (numpy.log2(self.ordredpeaks[:,0]/self.tonique(percent,method)[1]))*1200
 		return self.intervals
 
 class Melodies(object):
