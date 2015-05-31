@@ -5,3 +5,5 @@
 *.egg
 *.egg-info
 __pycache__
+
+diastema/*.pyc

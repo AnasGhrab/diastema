@@ -4,6 +4,8 @@ from scipy.stats.kde import gaussian_kde
 from scipy.stats.mstats import mode
 from math import log10
 
+import epimores
+
 import glob, os.path, time, os
 
 from essentia import *  # Importer toutes les fonctions de la bibliotheque Essentia
@@ -241,7 +243,6 @@ class Melodies(object):
 		"""Dessine les PDFs de tous les fichiers
 
 		"""
-		plt.figure(figsize=(18, 12))
 		for melodie_pdf in self.melodies:
 			melodie_pdf.pdf_show()
 		return plt.show()
@@ -295,3 +296,48 @@ class Melodies(object):
 				phrase.append(self.melodies[i].tonique(j, method)[1])
 			print 'Toniques possibles de la Phrase', i, ' : ', phrase	
 		return
+
+
+
+def epi(list="No"):
+	global inter
+	inter = {'2/1*4/3':2/1.*4/3.,'2/1*5/4':2/1.*5/4.,'2/1*6/5':2/1.*6/5.,
+	         '2/1*9/8':2/1.*9/8.,'2/1*10/9':2/1.*10/9.,'2/1*12/11':2/1.*12/11.,
+	         '2/1':2/1.,'3/2*5/4':3/2.*5/4.,'3/2*6/5':3/2.*6/5.,'3/2*9/8':3/2.*9/8.,
+	         '3/2*10/9':3/2.*10/9.,'3/2':3/2.,'4/3':4/3.,'5/4':5/4.,'9/8*12/11':9/8.*12/11.,
+	          '6/5':6/5.,'9/8':9/8.,'10/9':10/9.,'12/11':12/11.,'1/1':1/1.}
+	if list=="Yes":
+		for i in range(0,len(inter)):
+			I = numpy.float32(log10(inter.values()[i])*1000)
+			print inter.keys()[i],' :: ',I, 's.'
+	return inter
+
+def Inters(Echelle):
+	"""Compares scale information with defined ratios
+
+	Input :
+	-----------
+		Echelle : a scale data in savarts
+	"""
+	
+	inter = epi()
+	I = inter.values()
+	Int = []
+	for i in range(0,len(I)):
+	     Int.append(log10(I[i])*1000)
+	        
+	        
+	Intervalles = []
+	for i in range(0,len(Echelle)):
+	    dist = []
+	    for j in range(0,len(Int)):
+	        dist.append(abs(abs(Echelle[i])-abs(Int[j])))
+	    Index_Intervalle_Proche = dist.index(min(dist))
+	    Nom_Intervalle_Proche = inter.keys()[dist.index(min(dist))]
+	    Difference = "{:.2f}".format(min(dist))
+	    #print Echelle[i],inter.values()[dist.index(min(dist))]
+	    if Echelle[i]>=log10(inter.values()[dist.index(min(dist))])*1000:
+	        signe = '+'
+	    else: signe  = '-'
+	    Intervalles.append(["{:.2f}".format(Echelle[i]),Nom_Intervalle_Proche,signe, Difference])
+	return Intervalles
