@@ -4,8 +4,6 @@ from scipy.stats.kde import gaussian_kde
 from scipy.stats.mstats import mode
 from math import log10
 
-import epimores
-
 import glob, os.path, time, os
 
 from essentia import *  # Importer toutes les fonctions de la bibliotheque Essentia
