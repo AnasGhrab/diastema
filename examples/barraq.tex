@@ -1,0 +1,758 @@
+
+% Default to the notebook output style
+
+    
+
+
+% Inherit from the specified cell style.
+
+
+
+
+    
+\documentclass{article}
+
+    
+    
+    \usepackage{graphicx} % Used to insert images
+    \usepackage{adjustbox} % Used to constrain images to a maximum size 
+    \usepackage{color} % Allow colors to be defined
+    \usepackage{enumerate} % Needed for markdown enumerations to work
+    \usepackage{geometry} % Used to adjust the document margins
+    \usepackage{amsmath} % Equations
+    \usepackage{amssymb} % Equations
+    \usepackage{eurosym} % defines \euro
+    \usepackage[mathletters]{ucs} % Extended unicode (utf-8) support
+    \usepackage[utf8x]{inputenc} % Allow utf-8 characters in the tex document
+    \usepackage{fancyvrb} % verbatim replacement that allows latex
+    \usepackage{grffile} % extends the file name processing of package graphics 
+                         % to support a larger range 
+    % The hyperref package gives us a pdf with properly built
+    % internal navigation ('pdf bookmarks' for the table of contents,
+    % internal cross-reference links, web links for URLs, etc.)
+    \usepackage{hyperref}
+    \usepackage{longtable} % longtable support required by pandoc >1.10
+    \usepackage{booktabs}  % table support for pandoc > 1.12.2
+    
+
+    
+    
+    \definecolor{orange}{cmyk}{0,0.4,0.8,0.2}
+    \definecolor{darkorange}{rgb}{.71,0.21,0.01}
+    \definecolor{darkgreen}{rgb}{.12,.54,.11}
+    \definecolor{myteal}{rgb}{.26, .44, .56}
+    \definecolor{gray}{gray}{0.45}
+    \definecolor{lightgray}{gray}{.95}
+    \definecolor{mediumgray}{gray}{.8}
+    \definecolor{inputbackground}{rgb}{.95, .95, .85}
+    \definecolor{outputbackground}{rgb}{.95, .95, .95}
+    \definecolor{traceback}{rgb}{1, .95, .95}
+    % ansi colors
+    \definecolor{red}{rgb}{.6,0,0}
+    \definecolor{green}{rgb}{0,.65,0}
+    \definecolor{brown}{rgb}{0.6,0.6,0}
+    \definecolor{blue}{rgb}{0,.145,.698}
+    \definecolor{purple}{rgb}{.698,.145,.698}
+    \definecolor{cyan}{rgb}{0,.698,.698}
+    \definecolor{lightgray}{gray}{0.5}
+    
+    % bright ansi colors
+    \definecolor{darkgray}{gray}{0.25}
+    \definecolor{lightred}{rgb}{1.0,0.39,0.28}
+    \definecolor{lightgreen}{rgb}{0.48,0.99,0.0}
+    \definecolor{lightblue}{rgb}{0.53,0.81,0.92}
+    \definecolor{lightpurple}{rgb}{0.87,0.63,0.87}
+    \definecolor{lightcyan}{rgb}{0.5,1.0,0.83}
+    
+    % commands and environments needed by pandoc snippets
+    % extracted from the output of `pandoc -s`
+    \DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+    % Add ',fontsize=\small' for more characters per line
+    \newenvironment{Shaded}{}{}
+    \newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
+    \newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{{#1}}}
+    \newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\StringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{{#1}}}}
+    \newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{{#1}}}
+    \newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{{#1}}}
+    \newcommand{\RegionMarkerTok}[1]{{#1}}
+    \newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\NormalTok}[1]{{#1}}
+    
+    % Define a nice break command that doesn't care if a line doesn't already
+    % exist.
+    \def\br{\hspace*{\fill} \\* }
+    % Math Jax compatability definitions
+    \def\gt{>}
+    \def\lt{<}
+    % Document parameters
+    \title{Fonctions de probabilité de densité et coefficients de corrélation comme outils d'analyse mélodique}
+    \author{Anas GHRAB - http://anas.ghrab.tn\\
+    Institut Supérieur de Musique - Université de Sousse (Tunisie)\\
+    Centre des Musiques Arabes et Méditerranéennes}
+    \date{31 mai 2015}    
+    
+
+    % Pygments definitions
+    
+\makeatletter
+\def\PY@reset{\let\PY@it=\relax \let\PY@bf=\relax%
+    \let\PY@ul=\relax \let\PY@tc=\relax%
+    \let\PY@bc=\relax \let\PY@ff=\relax}
+\def\PY@tok#1{\csname PY@tok@#1\endcsname}
+\def\PY@toks#1+{\ifx\relax#1\empty\else%
+    \PY@tok{#1}\expandafter\PY@toks\fi}
+\def\PY@do#1{\PY@bc{\PY@tc{\PY@ul{%
+    \PY@it{\PY@bf{\PY@ff{#1}}}}}}}
+\def\PY#1#2{\PY@reset\PY@toks#1+\relax+\PY@do{#2}}
+
+\expandafter\def\csname PY@tok@gd\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.63,0.00,0.00}{##1}}}
+\expandafter\def\csname PY@tok@gu\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.50,0.00,0.50}{##1}}}
+\expandafter\def\csname PY@tok@gt\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.27,0.87}{##1}}}
+\expandafter\def\csname PY@tok@gs\endcsname{\let\PY@bf=\textbf}
+\expandafter\def\csname PY@tok@gr\endcsname{\def\PY@tc##1{\textcolor[rgb]{1.00,0.00,0.00}{##1}}}
+\expandafter\def\csname PY@tok@cm\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@vg\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@m\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@mh\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@go\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.53,0.53,0.53}{##1}}}
+\expandafter\def\csname PY@tok@ge\endcsname{\let\PY@it=\textit}
+\expandafter\def\csname PY@tok@vc\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@il\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@cs\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@cp\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.74,0.48,0.00}{##1}}}
+\expandafter\def\csname PY@tok@gi\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.63,0.00}{##1}}}
+\expandafter\def\csname PY@tok@gh\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\expandafter\def\csname PY@tok@ni\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.60,0.60,0.60}{##1}}}
+\expandafter\def\csname PY@tok@nl\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.63,0.63,0.00}{##1}}}
+\expandafter\def\csname PY@tok@nn\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\expandafter\def\csname PY@tok@no\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.53,0.00,0.00}{##1}}}
+\expandafter\def\csname PY@tok@na\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.49,0.56,0.16}{##1}}}
+\expandafter\def\csname PY@tok@nb\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@nc\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\expandafter\def\csname PY@tok@nd\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\expandafter\def\csname PY@tok@ne\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.82,0.25,0.23}{##1}}}
+\expandafter\def\csname PY@tok@nf\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\expandafter\def\csname PY@tok@si\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.73,0.40,0.53}{##1}}}
+\expandafter\def\csname PY@tok@s2\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@vi\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@nt\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@nv\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@s1\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@kd\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@sh\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sc\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sx\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@bp\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@c1\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@kc\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@c\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@mf\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@err\endcsname{\def\PY@bc##1{\setlength{\fboxsep}{0pt}\fcolorbox[rgb]{1.00,0.00,0.00}{1,1,1}{\strut ##1}}}
+\expandafter\def\csname PY@tok@mb\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@ss\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@sr\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.40,0.53}{##1}}}
+\expandafter\def\csname PY@tok@mo\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@kn\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@mi\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@gp\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\expandafter\def\csname PY@tok@o\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@kr\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@s\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@kp\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@w\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.73,0.73}{##1}}}
+\expandafter\def\csname PY@tok@kt\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.69,0.00,0.25}{##1}}}
+\expandafter\def\csname PY@tok@ow\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\expandafter\def\csname PY@tok@sb\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@k\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@se\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.73,0.40,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sd\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+
+\def\PYZbs{\char`\\}
+\def\PYZus{\char`\_}
+\def\PYZob{\char`\{}
+\def\PYZcb{\char`\}}
+\def\PYZca{\char`\^}
+\def\PYZam{\char`\&}
+\def\PYZlt{\char`\<}
+\def\PYZgt{\char`\>}
+\def\PYZsh{\char`\#}
+\def\PYZpc{\char`\%}
+\def\PYZdl{\char`\$}
+\def\PYZhy{\char`\-}
+\def\PYZsq{\char`\'}
+\def\PYZdq{\char`\"}
+\def\PYZti{\char`\~}
+% for compatibility with earlier versions
+\def\PYZat{@}
+\def\PYZlb{[}
+\def\PYZrb{]}
+\makeatother
+
+
+    % Exact colors from NB
+    \definecolor{incolor}{rgb}{0.0, 0.0, 0.5}
+    \definecolor{outcolor}{rgb}{0.545, 0.0, 0.0}
+
+
+
+    
+    % Prevent overflowing lines due to hard-to-break entities
+    \sloppy 
+    % Setup hyperref package
+    \hypersetup{
+      breaklinks=true,  % so long urls are correctly broken across lines
+      colorlinks=true,
+      urlcolor=blue,
+      linkcolor=darkorange,
+      citecolor=darkgreen,
+      }
+    % Slightly bigger margins than the latex defaults
+    
+    \geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+    
+    
+
+    \begin{document}
+    
+    
+    \maketitle
+    
+
+    \subsection*{Introduction}\label{introduction}
+
+    Un des objectifs de l'analyse de la musique modale est la comparaison
+des mélodies, ce qui implique, progressivement, leur classification.
+Alors que les méthodes classiques d'analyse permettent de saisir les
+spécificités modales sur un ensemble délimité, et dont le nombre est
+généralement réduit, nous savons que la pertinence des résultats est en
+étroite relation avec la quantité de données analysées.
+
+Nous proposons ici une méthode générale pour la mesure de la proximité
+mélodique applicable à une base de données sonores. Nous partons d'une
+analyse des données fréquentielles afin d'obtenir une fonction indiquant
+la répartition de la densité des fréquences. Ceci nous permettra
+d'aboutir, par le calcul des différents coefficients de corrélation de
+ces fonctions, à une classification des mélodies, nous renseignant ainsi
+sur leur proximité mélodique, sur la base de leur échelle.
+
+Nous montrons ici l'aspect pratique de cette approche, en prenant comme
+exemple l'analyse d'une chant à voix seule par l'illustre \emph{Muqriʾ}
+tunisien ʿAlī al-Barrāq (1891-1981).
+
+L'ensemble des approches présentées ici ont été implémenté dans un
+module Python, que nous avons appelé \textbf{Diastema}. Ce module est
+téléchargeable à partir de l'adresse :
+https://github.com/AnasGhrab/diastema. Nous incluons ici toutes les
+commandes nécessaires à son utilisation.
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}1}]:} \PY{o}{\PYZpc{}}\PY{k}{matplotlib} inline
+        \PY{k+kn}{from} \PY{n+nn}{diastema} \PY{k+kn}{import} \PY{o}{*}
+        \PY{k+kn}{from} \PY{n+nn}{IPython.display} \PY{k+kn}{import} \PY{n}{Audio}
+\end{Verbatim}
+
+    \section{L'échelle musicale représentée par une fonction de densité de
+probabilité des
+fréquences}\label{luxe9chelle-musicale-repruxe9sentuxe9e-par-une-fonction-de-densituxe9-de-probabilituxe9-des-fruxe9quences}
+
+    \subsection{La mélodie comme liste de
+fréquences}\label{la-muxe9lodie-comme-liste-de-fruxe9quences}
+
+    On sait, au moins depuis les travaux de Charles Seeger (1886 -- 1979)
+sur le mélographe, qu'il est musicologiquement plus pertinant de
+représenter une mélodie par une courbe fréquencielle qu'en utilisant une
+notation symbolique (voir fig. 1).
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}2}]:} \PY{k+kn}{from} \PY{n+nn}{IPython.display} \PY{k+kn}{import} \PY{n}{Image}
+        
+        \PY{n}{Image}\PY{p}{(}\PY{n}{url}\PY{o}{=}\PY{l+s}{\PYZsq{}}\PY{l+s}{http://localhost/images/melograph.jpg}\PY{l+s}{\PYZsq{}}\PY{p}{)}
+\end{Verbatim}
+
+            \begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}2}]:} <IPython.core.display.Image object>
+\end{Verbatim}
+        
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}3}]:} \PY{n}{Image}\PY{p}{(}\PY{n}{url}\PY{o}{=}\PY{l+s}{\PYZsq{}}\PY{l+s}{http://localhost/images/seegermelo.jpg}\PY{l+s}{\PYZsq{}}\PY{p}{)}
+\end{Verbatim}
+
+            \begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}3}]:} <IPython.core.display.Image object>
+\end{Verbatim}
+        
+    Les données fréquencielles d'une mélodie peuvent être obtenues
+aujourd'hui par l'analyse computationnelle de la fondamentale d'un
+enregistrement sonore numérique. Plusieurs algorithmes et
+implémentations existent : l'algorithme de Praat (Paul Boersma :
+\emph{Accurate short-term analysis of the fundamental frequency and the
+harmonics-to-noise ratio of a sampled sound.} IFA Proceedings 17(1993):
+97-110.), Yin (ref), etc. Nous utiliserons ici l'algorithme
+\textbf{Melodia} implémenté dans Essentia par la méthode
+PredominentMelody() (ref).
+
+    Prenons comme exemple un chant en \emph{Raṣd Ḏīl} de ʿAlī Barrāq
+(enregistrement publié dans le CD accompagnant l'ouvrage : Manoubi
+Snoussi, \emph{Initiation à la Musique Tunisienne}, CMAM, \ldots{}),
+segmenté manuellement en six phrases :
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}4}]:} \PY{n}{dossier} \PY{o}{=} \PY{l+s}{\PYZdq{}}\PY{l+s}{/Users/anas/AUDIO/Barraq/}\PY{l+s}{\PYZdq{}}
+        \PY{n}{Barraq} \PY{o}{=} \PY{n}{Melodies}\PY{p}{(}\PY{n}{dossier}\PY{p}{,}\PY{l+m+mi}{100}\PY{p}{,}\PY{l+m+mi}{450}\PY{p}{)}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+Lecture et analyse de  7  fichiers (.txt) dans le dossier : /Users/anas/AUDIO/Barraq/
+    \end{Verbatim}
+
+    On peut représenter par exemple la courbe mélodique de la première
+phrase :
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}5}]:} \PY{n}{Y} \PY{o}{=} \PY{n}{Barraq}\PY{o}{.}\PY{n}{melodies}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{o}{.}\PY{n}{frequences} \PY{c}{\PYZsh{} La numérotation des mélodies commence à zéro}
+        \PY{n}{plt}\PY{o}{.}\PY{n}{figure}\PY{p}{(}\PY{n}{figsize}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{9}\PY{p}{,}\PY{l+m+mi}{6}\PY{p}{)}\PY{p}{)}
+        \PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{Y}\PY{p}{,}\PY{l+s}{\PYZsq{}}\PY{l+s}{o}\PY{l+s}{\PYZsq{}}\PY{p}{)}
+\end{Verbatim}
+
+            \begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}5}]:} [<matplotlib.lines.Line2D at 0x10bae21d0>]
+\end{Verbatim}
+        
+    \begin{center}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{barraq_files/barraq_14_1.png}
+    \end{center}
+    { \hspace*{\fill} \\}
+    
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}6}]:} \PY{n}{Audio}\PY{p}{(}\PY{n}{filename}\PY{o}{=}\PY{l+s}{\PYZdq{}}\PY{l+s}{/Users/anas/AUDIO/Barraq/P1.wav}\PY{l+s}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+
+            \begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}6}]:} <IPython.lib.display.Audio object>
+\end{Verbatim}
+        
+    Analyser la courbe revient à analyser les données numériques de la
+courbe.
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}7}]:} \PY{n}{Y} \PY{o}{=} \PY{n}{Barraq}\PY{o}{.}\PY{n}{melodies}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{o}{.}\PY{n}{freq}
+        \PY{k}{print} \PY{n}{Y}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{:}\PY{l+m+mi}{50}\PY{p}{]}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+[ 155.564  157.372  160.123  163.866  166.73   168.667  171.616  173.61
+  175.627  177.668  179.732  180.773  182.874  184.999  186.07   188.232
+  189.323  189.323  191.523  192.632  193.748  193.748  194.87   194.87
+  194.87   194.87   194.87   194.87   193.748  193.748  192.632  192.632
+  193.748  193.748  194.87   194.87   195.999  195.999  195.999  195.999
+  194.87   194.87   194.87   194.87   194.87   194.87   194.87   194.87
+  194.87   194.87 ]
+    \end{Verbatim}
+
+    \subsection{Fonction de densité de probabilité et pôles
+fréquentiels}\label{fonction-de-densituxe9-de-probabilituxe9-et-puxf4les-fruxe9quentiels}
+
+    Une des méthodes permettant d'analyser la densité des fréquences dans
+les données est l'estimation de la densité par noyaux gaussiens
+(\emph{Kernel Density Estimation} :
+http://docs.scipy.org/doc/scipy-0.15.1/reference/generated/scipy.stats.gaussian\_kde.html;
+nous utiliserons ici un bw\_method=.1). Cette méthode nous permet
+d'avoir une fonction de densité de probabilité (\emph{Probability
+Density Estimation}). Appliquée à la première phrase, nous obtenons la
+représentation suivante :
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}8}]:} \PY{n}{plt}\PY{o}{.}\PY{n}{figure}\PY{p}{(}\PY{n}{figsize}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{9}\PY{p}{,}\PY{l+m+mi}{6}\PY{p}{)}\PY{p}{)}
+        \PY{n}{Barraq}\PY{o}{.}\PY{n}{melodies}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{o}{.}\PY{n}{pdf\PYZus{}show}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+
+    \begin{center}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{barraq_files/barraq_20_0.png}
+    \end{center}
+    { \hspace*{\fill} \\}
+    
+    Nous pouvons lire sur le graphe que la fréquence dont l'appaarition est
+la plus probable dans un pareil extrait, c'est la fréquence 242 Hz.
+Ensuite, avec une moindre probabilité, la fréquence 200 Hz, etc. Il est
+possible d'obtenir tous les pics représentés par la commande :
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}9}]:} \PY{n}{Barraq}\PY{o}{.}\PY{n}{melodies}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{o}{.}\PY{n}{peaks}
+\end{Verbatim}
+
+            \begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}9}]:} array([ 162.1777,  200.2865,  219.341 ,  242.4069,  273.4957,  296.5616,
+                321.6332,  365.7593,  404.8711,  434.957 ])
+\end{Verbatim}
+        
+    Les probabilités de ces pics sont :
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}10}]:} \PY{n}{Barraq}\PY{o}{.}\PY{n}{melodies}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{o}{.}\PY{n}{peakspdf}
+\end{Verbatim}
+
+            \begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}10}]:} array([  5.2252e-03,   8.5358e-03,   5.0912e-03,   1.0044e-02,
+                  5.6737e-03,   4.4165e-03,   4.9976e-03,   1.1381e-03,
+                  2.2812e-04,   2.8166e-05])
+\end{Verbatim}
+        
+    \subsection{Comparaison des fonctions de densité de
+probabilité}\label{comparaison-des-fonctions-de-densituxe9-de-probabilituxe9}
+
+    Nous pouvons généraliser la procédure et placer sur un même graphe les
+fonctions de densités de probabilités relatives aux fréquences des
+quatre phrases musicales :
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}26}]:} \PY{n}{plt}\PY{o}{.}\PY{n}{figure}\PY{p}{(}\PY{n}{figsize}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{16}\PY{p}{,}\PY{l+m+mi}{7}\PY{p}{)}\PY{p}{)}
+         \PY{n}{Barraq}\PY{o}{.}\PY{n}{PdfsPlot}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+
+    \begin{center}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{barraq_files/barraq_27_0.png}
+    \end{center}
+    { \hspace*{\fill} \\}
+    
+    Plusieurs informations musicologiques peuvent êtes lus sur ce graphe.
+Nous pouvons voir que la plupart des courbes partagent les mêmes pôles
+fréquenciels que la totalité de l'extrait (\emph{P0}). Nous pouvons voir
+aussi que la première phrase (\emph{P1}) appuie principalement la
+fréquence dominante 244 Hz; celle-ci, avec de légères variations,
+constitue la fréquence la plus présente dans la plupart des extraits.
+
+Nous pouvons peut lire également que la troisième phrase (P3) appuie,
+encore plus que la deuxième phrase, les pôles fréquenciels aïgus, alors
+que la quatrième phrase appuie particulièrement la fréquence 200 Hz.
+
+Une méthode mathématique permettant d'analyser la proximité des courbes
+est le calcul des \emph{coefficient de corrélation}
+(http://docs.scipy.org/doc/numpy/reference/generated/numpy.corrcoef.html),
+ce qui nous donne les valeurs suivantes :
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}12}]:} \PY{n}{Barraq}\PY{o}{.}\PY{n}{PdfCorr}
+\end{Verbatim}
+
+            \begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}12}]:} array([[ 1.    ,  0.8945,  0.9698,  0.7143,  0.8769,  0.946 ,  0.9093],
+                [ 0.8945,  1.    ,  0.8782,  0.4979,  0.8524,  0.913 ,  0.7122],
+                [ 0.9698,  0.8782,  1.    ,  0.7984,  0.7916,  0.8906,  0.8133],
+                [ 0.7143,  0.4979,  0.7984,  1.    ,  0.377 ,  0.5059,  0.5774],
+                [ 0.8769,  0.8524,  0.7916,  0.377 ,  1.    ,  0.9005,  0.7847],
+                [ 0.946 ,  0.913 ,  0.8906,  0.5059,  0.9005,  1.    ,  0.859 ],
+                [ 0.9093,  0.7122,  0.8133,  0.5774,  0.7847,  0.859 ,  1.    ]])
+\end{Verbatim}
+        
+    On peut représenter ces coefficients sous la forme d'une matrice de
+similarité (\emph{self-similarity matrix}), qui nous renseigne plus
+facilement sur la proximité entre les extraits :
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}13}]:} \PY{n}{Barraq}\PY{o}{.}\PY{n}{Simatrix}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+
+    \begin{center}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{barraq_files/barraq_31_0.png}
+    \end{center}
+    { \hspace*{\fill} \\}
+    
+    Ainsi, on peut lire que la proximité la plus élevée se trouve entre
+l'extrait et lui-même : 0 à 0, 1 à 1, 2 à 2, etc., (coeficient égale à
+1). On peut directement lire également que les extraits les plus proches
+de la totalité du chant (P0) sont les extraits 2, 5 et 6 ayant
+respectivement les coefficients de corrélation 0.9697, 0.9459 et 0.9093.
+L'extrait le plus éloigné étant la phrase 3, avec un coefficient de
+0.71426501. Cependant, cette valeur demeure élevée -- nous sommes encore
+relativement éloigné de la valeur 0--, ce qui montre que toutes les
+phrases partagent les mêmes pôles fréquenciels : nous n'avons pas de
+modulation dans ce chant.
+
+    \subsection{Analyse du contenu
+intervallique}\label{analyse-du-contenu-intervallique}
+
+    \subsubsection{Détection de la
+tonique}\label{duxe9tection-de-la-tonique}
+
+    On peut obtenir la tonique en la définissant comme étant la fréquence
+qui a la probabilité la plus élevée dans la dernière partie de la phrase
+(\emph{method=pdf}). Comparons ici les valeurs obtenues en considérant
+différents pourcentages des dernières fréquences présentes dans les
+différentes phrases (0.5\%, 1\%, 1.5\%, 2\%, 5\%, 10\%, 15\%) :
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}14}]:} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{0}\PY{p}{,}\PY{n+nb}{len}\PY{p}{(}\PY{n}{Barraq}\PY{o}{.}\PY{n}{melodies}\PY{p}{)}\PY{p}{)}\PY{p}{:}
+             \PY{n}{toniques} \PY{o}{=} \PY{p}{[}\PY{p}{]}
+             \PY{k}{for} \PY{n}{j} \PY{o+ow}{in} \PY{p}{[}\PY{l+m+mf}{0.5}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mf}{1.5}\PY{p}{,}\PY{l+m+mi}{2}\PY{p}{,}\PY{l+m+mi}{5}\PY{p}{,}\PY{l+m+mi}{10}\PY{p}{,}\PY{l+m+mi}{15}\PY{p}{]}\PY{p}{:}
+                 \PY{n}{toniques}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{Barraq}\PY{o}{.}\PY{n}{melodies}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{o}{.}\PY{n}{tonique}\PY{p}{(}\PY{n}{j}\PY{p}{,}\PY{n}{method}\PY{o}{=}\PY{l+s}{\PYZdq{}}\PY{l+s}{pdf}\PY{l+s}{\PYZdq{}}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+             \PY{k}{print} \PY{l+s}{\PYZdq{}}\PY{l+s}{Toniques possibles de la phrase }\PY{l+s}{\PYZdq{}}\PY{p}{,}\PY{n}{i}\PY{p}{,}\PY{l+s}{\PYZdq{}}\PY{l+s}{ : }\PY{l+s}{\PYZdq{}}\PY{p}{,} \PY{n}{toniques}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+Toniques possibles de la phrase  0  :  [163, 162, 162, 181, 187, 195, 198]
+Toniques possibles de la phrase  1  :  [166, 163, 162, 163, 184, 185, 189]
+Toniques possibles de la phrase  2  :  [156, 157, 158, 158, 183, 184, 186]
+Toniques possibles de la phrase  3  :  [312, 308, 184, 183, 186, 189, 194]
+Toniques possibles de la phrase  4  :  [158, 158, 159, 158, 183, 197, 198]
+Toniques possibles de la phrase  5  :  [158, 158, 157, 157, 183, 186, 189]
+Toniques possibles de la phrase  6  :  [163, 162, 162, 162, 162, 184, 186]
+    \end{Verbatim}
+
+    Il est possible de définir la tonique comme étant la fréquence la plus
+présente parmi les dernières fréquences (\emph{method=``mode''}) :
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}15}]:} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{0}\PY{p}{,}\PY{n+nb}{len}\PY{p}{(}\PY{n}{Barraq}\PY{o}{.}\PY{n}{melodies}\PY{p}{)}\PY{p}{)}\PY{p}{:}
+             \PY{n}{toniques} \PY{o}{=} \PY{p}{[}\PY{p}{]}
+             \PY{k}{for} \PY{n}{j} \PY{o+ow}{in} \PY{p}{[}\PY{l+m+mf}{0.5}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mf}{1.5}\PY{p}{,}\PY{l+m+mi}{2}\PY{p}{,}\PY{l+m+mi}{5}\PY{p}{,}\PY{l+m+mi}{10}\PY{p}{,}\PY{l+m+mi}{15}\PY{p}{]}\PY{p}{:}
+                 \PY{n}{toniques}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n+nb}{int}\PY{p}{(}\PY{n}{Barraq}\PY{o}{.}\PY{n}{melodies}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{o}{.}\PY{n}{tonique}\PY{p}{(}\PY{n}{j}\PY{p}{,}\PY{n}{method}\PY{o}{=}\PY{l+s}{\PYZdq{}}\PY{l+s}{mode}\PY{l+s}{\PYZdq{}}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}\PY{p}{)}
+             \PY{k}{print} \PY{l+s}{\PYZdq{}}\PY{l+s}{Toniques possibles de la phrase }\PY{l+s}{\PYZdq{}}\PY{p}{,}\PY{n}{i}\PY{p}{,}\PY{l+s}{\PYZdq{}}\PY{l+s}{ : }\PY{l+s}{\PYZdq{}}\PY{p}{,} \PY{n}{toniques}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+Toniques possibles de la phrase  0  :  [162, 162, 180, 180, 180, 158, 269]
+Toniques possibles de la phrase  1  :  [167, 167, 162, 163, 184, 184, 183]
+Toniques possibles de la phrase  2  :  [156, 158, 158, 158, 184, 245, 183]
+Toniques possibles de la phrase  3  :  [312, 312, 312, 182, 182, 182, 182]
+Toniques possibles de la phrase  4  :  [159, 159, 159, 157, 181, 197, 239]
+Toniques possibles de la phrase  5  :  [158, 158, 158, 158, 181, 181, 244]
+Toniques possibles de la phrase  6  :  [162, 162, 162, 162, 162, 180, 180]
+    \end{Verbatim}
+
+    Les deux méthodes s'accordent globalement dans les résultats obtenus
+entre 0.5\% et 1\% dernières fréquences de la phrase. La fréquence
+162-193 Hz est la tonique de tout le chant. Nous remarquons que cette
+tonique baisse dans les deuxième, quatrième et cinquième phrases {[}La
+fréquence de la tonique 312 indiquées pour la troisième phrase
+correspond à l'octave supérieur par rapport à la fréquence 156 Hz. Ceci
+est dû à la détection de la fréquence fondamentale par l'algorithme de
+détection f0.{]}.
+
+    \subsubsection{Tonique et fréquence dominante : intervalle
+dominant}\label{tonique-et-fruxe9quence-dominante-intervalle-dominant}
+
+    Dans un contexte modal, l'intervalle formé par la note-fréquence
+dominante et la tonique est un intervalle fondamental. Observons sa
+variation par rapport aux différentes phrases :
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}16}]:} \PY{n}{TD} \PY{o}{=} \PY{p}{[}\PY{p}{]}
+         \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{0}\PY{p}{,}\PY{n+nb}{len}\PY{p}{(}\PY{n}{Barraq}\PY{o}{.}\PY{n}{melodies}\PY{p}{)}\PY{p}{)}\PY{p}{:}
+             \PY{n}{tonique} \PY{o}{=} \PY{n}{Barraq}\PY{o}{.}\PY{n}{melodies}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{o}{.}\PY{n}{tonique}\PY{p}{(}\PY{o}{.}\PY{l+m+mi}{5}\PY{p}{,}\PY{n}{method}\PY{o}{=}\PY{l+s}{\PYZdq{}}\PY{l+s}{mode}\PY{l+s}{\PYZdq{}}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}
+             \PY{n}{peakidx} \PY{o}{=} \PY{n}{numpy}\PY{o}{.}\PY{n}{argmax}\PY{p}{(}\PY{n}{Barraq}\PY{o}{.}\PY{n}{melodies}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{o}{.}\PY{n}{peakspdf}\PY{p}{)}
+             \PY{n}{dominante} \PY{o}{=} \PY{n}{Barraq}\PY{o}{.}\PY{n}{melodies}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{o}{.}\PY{n}{peaks}\PY{p}{[}\PY{n}{peakidx}\PY{p}{]}
+             \PY{n}{TD}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{p}{[}\PY{n}{dominante}\PY{p}{,}\PY{n}{tonique}\PY{p}{]}\PY{p}{)}
+         \PY{n}{numpy}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{n}{TD}\PY{p}{)}
+\end{Verbatim}
+
+            \begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}16}]:} array([[ 242.4069,  162.922 ],
+                [ 244.4126,  167.696 ],
+                [ 243.4097,  156.466 ],
+                [ 321.6332,  312.932 ],
+                [ 200.2865,  159.201 ],
+                [ 242.4069,  158.284 ],
+                [ 271.49  ,  162.922 ]])
+\end{Verbatim}
+        
+    Pour une lecture comparative de ces valeurs ils seraient plus judicieux
+de les convertir sur une échelle linéaire; soit en savarts :
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}17}]:} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{0}\PY{p}{,}\PY{n+nb}{len}\PY{p}{(}\PY{n}{TD}\PY{p}{)}\PY{p}{)}\PY{p}{:}
+             \PY{n}{I} \PY{o}{=} \PY{n}{numpy}\PY{o}{.}\PY{n}{float32}\PY{p}{(}\PY{n}{log10}\PY{p}{(}\PY{n}{TD}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{o}{/}\PY{n}{TD}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}\PY{o}{*}\PY{l+m+mi}{1000}\PY{p}{)}
+             \PY{k}{print} \PY{l+s}{\PYZdq{}}\PY{l+s}{Intervalle fondamental de la phrase}\PY{l+s}{\PYZdq{}}\PY{p}{,} \PY{n}{i}\PY{p}{,}\PY{l+s}{\PYZdq{}}\PY{l+s}{ : }\PY{l+s}{\PYZdq{}}\PY{p}{,} \PY{n}{I}\PY{p}{,} \PY{l+s}{\PYZdq{}}\PY{l+s}{savarts}\PY{l+s}{\PYZdq{}}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+Intervalle fondamental de la phrase 0  :  172.565 savarts
+Intervalle fondamental de la phrase 1  :  163.601 savarts
+Intervalle fondamental de la phrase 2  :  191.918 savarts
+Intervalle fondamental de la phrase 3  :  11.9109 savarts
+Intervalle fondamental de la phrase 4  :  99.706 savarts
+Intervalle fondamental de la phrase 5  :  185.108 savarts
+Intervalle fondamental de la phrase 6  :  221.774 savarts
+    \end{Verbatim}
+
+    Rappelons la valeur des intervalles fondamentaux en savarts :
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}18}]:} \PY{k+kn}{from} \PY{n+nn}{diastema} \PY{k+kn}{import} \PY{n}{epimores}
+         \PY{n}{epi}\PY{p}{(}\PY{n+nb}{list}\PY{o}{=}\PY{l+s}{\PYZdq{}}\PY{l+s}{Yes}\PY{l+s}{\PYZdq{}}\PY{p}{)}\PY{p}{;}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+2/1*4/3  ::  425.969 s.
+4/3  ::  124.939 s.
+12/11  ::  37.7886 s.
+1/1  ::  0.0 s.
+6/5  ::  79.1812 s.
+3/2*6/5  ::  255.273 s.
+9/8*12/11  ::  88.9411 s.
+3/2*5/4  ::  273.001 s.
+2/1*12/11  ::  338.819 s.
+3/2*9/8  ::  227.244 s.
+2/1*9/8  ::  352.183 s.
+2/1*6/5  ::  380.211 s.
+3/2  ::  176.091 s.
+5/4  ::  96.91 s.
+3/2*10/9  ::  221.849 s.
+2/1  ::  301.03 s.
+10/9  ::  45.7575 s.
+2/1*10/9  ::  346.787 s.
+9/8  ::  51.1525 s.
+2/1*5/4  ::  397.94 s.
+    \end{Verbatim}
+
+    Nous pouvons voir que dans la plupart des phrases, l'intervalle
+fondamental est une quinte, dont la valeur est très variable. La phrase
+P4 s'appuie sur une tierce 5/4 et la dernière phrase sur une sixte.
+
+    \subsubsection{Échelle par rapport à la
+tonique}\label{uxe9chelle-par-rapport-uxe0-la-tonique}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}19}]:} \PY{n}{Barraq}\PY{o}{.}\PY{n}{melodies}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{o}{.}\PY{n}{get\PYZus{}intervals}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+
+            \begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}19}]:} array([ 172.5652,   89.672 ,  224.9708,   -1.9887,  129.14  ,  295.3812,
+                 260.1352,  351.2157,  395.337 ,  426.4666])
+\end{Verbatim}
+        
+    \subsubsection{Échelles de plusieurs
+extraits}\label{uxe9chelles-de-plusieurs-extraits}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}20}]:} \PY{n}{Barraq}\PY{o}{.}\PY{n}{Intervals}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+
+            \begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}20}]:} [array([ 172.5652,   89.672 ,  224.9708,   -1.9887,  129.14  ,  295.3812,
+                  260.1352,  351.2157,  395.337 ,  426.4666]),
+          array([ 163.6009,   81.4566,  124.468 ,   -1.3073,  289.5567,  220.3181,
+                  352.732 , -199.1464,  384.9402]),
+          array([ 191.918 ,  111.5593,  283.5301,  316.9845,   75.6679,  248.8542,
+                  154.5707,   18.2483,  367.583 ,  398.6819]),
+          array([  11.9109,  -20.4077, -109.112 ,  -53.7481, -195.9783, -285.459 ,
+                   67.7454,  112.9412,  142.9964]),
+          array([  99.706 ,  182.5991,   10.7225,   65.7973,  143.1273,  233.4093,
+                  265.7407,  301.3336,  368.3361]),
+          array([ 185.1079,  100.0347,  234.3168,    5.1494,  263.7755,  307.9239,
+                  366.1334]),
+          array([ 221.7741,  170.7647,   87.492 ,   -7.3934,  121.1238,   48.652 ,
+                  289.9305, -132.5911,  347.6285])]
+\end{Verbatim}
+        
+    \subsection{Une fonction de densité de probabilité comme échelle
+générale}\label{une-fonction-de-densituxe9-de-probabilituxe9-comme-uxe9chelle-guxe9nuxe9rale}
+
+    Afin de constituer une échelle générale du chant, nous pourrions définir
+une fonction de densité de probabilité comme étant la somme des
+différentes fonctions. Nous pouvons comparer cette fonction à celle
+obtenu par la totalite du chant, P0 :
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}21}]:} \PY{n}{PDF} \PY{o}{=} \PY{p}{[}\PY{p}{]}
+         \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{1}\PY{p}{,}\PY{n+nb}{len}\PY{p}{(}\PY{n}{Barraq}\PY{o}{.}\PY{n}{melodies}\PY{p}{)}\PY{p}{)}\PY{p}{:}
+             \PY{n}{PDF} \PY{o}{=}\PY{o}{+} \PY{n}{Barraq}\PY{o}{.}\PY{n}{melodies}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{o}{.}\PY{n}{pdf}
+         
+         \PY{n}{PDF\PYZus{}norm} \PY{o}{=} \PY{n}{PDF}\PY{o}{*}\PY{l+m+mi}{1}\PY{o}{/}\PY{n+nb}{max}\PY{p}{(}\PY{n}{PDF}\PY{p}{)}
+         \PY{n}{P0\PYZus{}norm} \PY{o}{=} \PY{n}{Barraq}\PY{o}{.}\PY{n}{melodies}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{o}{.}\PY{n}{pdf}\PY{o}{*}\PY{p}{(}\PY{l+m+mi}{1}\PY{o}{/}\PY{n+nb}{max}\PY{p}{(}\PY{n}{Barraq}\PY{o}{.}\PY{n}{melodies}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{o}{.}\PY{n}{pdf}\PY{p}{)}\PY{p}{)}
+         \PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{PDF\PYZus{}norm}\PY{p}{,} \PY{n}{label}\PY{o}{=}\PY{l+s}{\PYZdq{}}\PY{l+s}{Global PDF}\PY{l+s}{\PYZdq{}}\PY{p}{)}
+         \PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{P0\PYZus{}norm}\PY{p}{,} \PY{n}{label}\PY{o}{=}\PY{l+s}{\PYZdq{}}\PY{l+s}{P0 pdf}\PY{l+s}{\PYZdq{}}\PY{p}{)}
+         \PY{n}{plt}\PY{o}{.}\PY{n}{legend}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+
+            \begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}21}]:} <matplotlib.legend.Legend at 0x1124d0f90>
+\end{Verbatim}
+        
+    \begin{center}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{barraq_files/barraq_54_1.png}
+    \end{center}
+    { \hspace*{\fill} \\}
+    
+    Nous remarquons que la PDF globale, somme de toutes les fonctions de
+densité de probabilité : comme elle prend en considération les
+différentes variations de la tonique selon les phrases, les pôles
+fréquenciels se trouvent affirmés. C'est donc cette fonction que nous
+prendrons en considération pour la détermination de l'échelle globale.
+Ses pics peuvent être obtenus comme suit :
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}22}]:} \PY{n}{P} \PY{o}{=} \PY{p}{(}\PY{p}{(}\PY{n}{numpy}\PY{o}{.}\PY{n}{diff}\PY{p}{(}\PY{n}{numpy}\PY{o}{.}\PY{n}{sign}\PY{p}{(}\PY{n}{numpy}\PY{o}{.}\PY{n}{diff}\PY{p}{(}\PY{n}{PDF}\PY{p}{)}\PY{p}{)}\PY{p}{)} \PY{o}{\PYZlt{}} \PY{l+m+mi}{0}\PY{p}{)}\PY{o}{.}\PY{n}{nonzero}\PY{p}{(}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]} \PY{o}{+} \PY{l+m+mi}{1}\PY{p}{)}\PY{o}{+}\PY{l+m+mi}{100} \PY{c}{\PYZsh{} local max}
+         \PY{n}{P}
+\end{Verbatim}
+
+            \begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}22}]:} array([120, 160, 182, 199, 215, 241, 271, 317, 362])
+\end{Verbatim}
+        
+    Ainsi, \textbf{l'échelle musicale de tout le chant, en savarts} peut
+donc être représentée par les intervalles :
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}23}]:} \PY{n}{Echelle} \PY{o}{=} \PY{p}{[}\PY{p}{]}
+         \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{0}\PY{p}{,}\PY{n+nb}{len}\PY{p}{(}\PY{n}{P}\PY{p}{)}\PY{p}{)}\PY{p}{:}
+             \PY{n}{Echelle}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{log10}\PY{p}{(}\PY{n}{P}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{o}{/}\PY{l+m+mf}{160.}\PY{p}{)}\PY{o}{*}\PY{l+m+mi}{1000}\PY{p}{)} \PY{c}{\PYZsh{} 160 Hz étant la tonique}
+\end{Verbatim}
+
+    La méthode \emph{Intervs()} nous permet de comparer contenu de cette
+échelle en comparant les intervalles en savarts aux valeurs des
+intervalles de références :
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}24}]:} \PY{n}{Inters}\PY{p}{(}\PY{n}{Echelle}\PY{p}{)}
+\end{Verbatim}
+
+            \begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}24}]:} [['-124.94', '4/3', '-', '0.00'],
+          ['0.00', '1/1', '+', '0.00'],
+          ['55.95', '9/8', '+', '4.80'],
+          ['94.73', '5/4', '-', '2.18'],
+          ['128.32', '4/3', '+', '3.38'],
+          ['177.90', '3/2', '+', '1.81'],
+          ['228.85', '3/2*9/8', '+', '1.61'],
+          ['296.94', '2/1', '-', '4.09'],
+          ['354.59', '2/1*9/8', '+', '2.41']]
+\end{Verbatim}
+        
+    Ainsi, selon cette approche, dans ce chant ʿAlī al-Barrāq, la quarte au
+dessous de la tonique est très exacte. Le ton est un peu large (plus
+grave que le ton 9/8 de 4.8 savarts). C'est l'intervalle le plus éloigné
+de l'intervalle de référence. Sachant que l'intervalle épimore le plus
+proche de cet écart est l'intervalle 91/90, lui-même plus petit qu'un
+comma syntonique (81/80), on peut dire que ces intervalles représentent
+de manière assez précise l'échelle globale utilisée dans ce chant.
+
+    \subsection*{Conclusion}\label{conclusion}
+
+    Nous venons de voir comment il est possible d'utiliser certains concepts
+statistiques et musicologiques, que nous avons implémentés dans le
+module Python Diastema, afin de développer une méthode d'analyse des
+intervalles mélodiques. L'avantage de cette méthode est de pouvoir
+comparer de manière relativement objective et rapide un ensemble de
+mélodies, sur la base de leur échelle. Étant donnée que l'échelle est
+conçu comme une probabilité de présence des fréquences, les pics de de
+la courbe donnée par les différentes fonctions nous renseignent sur les
+pôles fréquenciels présents dans la mélodie. Pour une appréciation de ce
+contenu fréquentiels, il est nécessaire de retourner à des concepts
+musicologiques, comme la tonique. Nous avons vu que les résultats
+peuvent varier selon les paramètres utilisés pour la détection de la
+fréquence représentative de la tonique d'une phrase. Finalement,
+l'échelle globale d'une mélodie segmentée peut-être obtenue à partir de
+la somme des fonctions des densités de probabilité.
+
+
+    % Add a bibliography block to the postdoc
+    
+    
+    
+    \end{document}

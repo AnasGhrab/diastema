@@ -33,7 +33,7 @@ Or :
 	python setup.py install
 
 
-Usage
+Basic Usage
 =====
 
 To use Diastema :
@@ -51,6 +51,10 @@ Then you can
 	Music.PdfsPlot()
 	Music.Simatrix()
 		
+To Do
+=====
+
+
 Contact
 =======
 
