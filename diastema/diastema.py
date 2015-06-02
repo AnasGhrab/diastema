@@ -352,9 +352,19 @@ class Melodies(object):
 		self.Echelle = []
 		for i in range(0,len(self.GP)):
 			nb_ext = len(self.melodies)
-			tonique = self.melodies[nb_ext-1].tonique()[1]
+			#tonique = self.melodies[nb_ext-1].tonique()[1]
+			tonique = self.GetTheTonic()
 			self.Echelle.append(log10(P[i]/tonique)*1000)
 		return self.Echelle
+
+	def GetTheTonic(self):
+		lastonic = self.melodies[len(self.melodies)-1].tonique()[1]
+		def find_nearest(array,value):
+		    idx = (numpy.abs(array-value)).argmin()
+		    return array[idx]
+		P = self.GlobalPeaks()[:,0]
+		self.TheTonic = find_nearest(P,lastonic)
+		return self.TheTonic
 
 def epi(list="No"):
 	global inter
