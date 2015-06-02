@@ -69,7 +69,7 @@ class Melodie(object):
 
 		return
 	
-	def pdf(self, x):
+	def pdf(self):
 		"""
 		Estime la densite de probabilite
 
@@ -84,7 +84,7 @@ class Melodie(object):
 
 	    """
 
-		return self.pdf.evaluate(x)
+		return self.pdf.evaluate(self.x)
 
 	def pdf_show(self):
 	 	"""Affichage de la fonction de la densite de probabilite"""
@@ -239,12 +239,17 @@ class Melodies(object):
 		self.PdfCorr = numpy.corrcoef(PDFS)
 		return self.PdfCorr
 
-	def PdfsPlot(self):
+	def PdfsPlot(self,allplots="Yes",gpdf="No"):
 		"""Dessine les PDFs de tous les fichiers
 
 		"""
-		for melodie_pdf in self.melodies:
-			melodie_pdf.pdf_show()
+		if allplots == "Yes":
+			for melodie_pdf in self.melodies:
+				melodie_pdf.pdf_show()
+		if gpdf == "Yes":
+			self.GlobalPdf()
+			self.GPDF_show()
+			#plt.plot(self.melodies[0].x,self.GPDF,label="GPDF")
 		return plt.show()
 
 	def Simatrix(self):
@@ -255,8 +260,8 @@ class Melodies(object):
 		l = len(self.PdfCorr)
 		plt.pcolor(R)
 		plt.colorbar()
-		plt.yticks(numpy.arange(0.5,l+0.5),range(0,l))
-		plt.xticks(numpy.arange(0.5,l+0.5),range(0,l))
+		plt.yticks(numpy.arange(0.5,l+0.5),range(1,l+1))
+		plt.xticks(numpy.arange(0.5,l+0.5),range(1,l+1))
 		return plt.show()
 
 	def SimPdf(self,i):
@@ -297,7 +302,59 @@ class Melodies(object):
 			print 'Toniques possibles de la Phrase', i, ' : ', phrase	
 		return
 
+	def GlobalPdf(self):
+		"""Get a global PDF as a sum of all pdf-s
 
+		"""
+		a = [self.melodies[0].pdf]
+		for i in range(1,len(self.melodies)):
+		    a = numpy.append(a,[self.melodies[i].pdf],axis=0)
+		self.GPDF = numpy.sum(a,axis=0)
+		return self.GPDF
+
+	def GPDF_show(self):
+	 	"""Plot the Global PDF and shows its peaks"""
+
+		self.GlobalPdf()
+		self.GlobalPeaks()
+		plt.plot(self.melodies[0].x,self.GPDF,linewidth=3,alpha=.6,label="GPDF")
+		plt.plot(self.Gpeaks, self.Gpeakspdf, "ro")
+		for i in range(0,len(self.Gpeaks)):
+			plt.annotate(
+					"%.2f" % self.Gpeaks[i],
+					xy=(self.Gpeaks[i], self.Gpeakspdf[i]),
+					xytext=(self.Gpeaks[i], (self.Gpeakspdf[i]+0.0001)))
+		plt.legend()
+
+	def GlobalPeaks(self):
+		"""Get global peaks from Global PDF 
+
+		"""
+		c = ((numpy.diff(numpy.sign(numpy.diff(self.GPDF))) < 0).nonzero()[0] + 1)#+self.melodies[0].xmin # local max
+
+		self.Gpeaks = self.melodies[0].x[c]
+		self.Gpeakspdf = self.GPDF[c]
+		c1 = numpy.array(self.Gpeaks, float)
+		c2 = numpy.array(self.Gpeakspdf, float)
+		c = numpy.array([c1,c2])
+		c = c.transpose()
+		c = c[c[:,1].argsort()]
+		self.Gordredpeaks = c[::-1]
+
+		self.GP = self.Gordredpeaks
+		return self.GP
+
+	def GlobalScale(self):
+		"""Get a global scale from GlobalPeaks 
+
+		"""
+		P = self.GlobalPeaks()[:,0]
+		self.Echelle = []
+		for i in range(0,len(self.GP)):
+			nb_ext = len(self.melodies)
+			tonique = self.melodies[nb_ext-1].tonique()[1]
+			self.Echelle.append(log10(P[i]/tonique)*1000)
+		return self.Echelle
 
 def epi(list="No"):
 	global inter
