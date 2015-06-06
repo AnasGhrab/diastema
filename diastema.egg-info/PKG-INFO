@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: diastema
-Version: 0.0.2
+Version: 0.0.3
 Summary: A tool for modal music analysis : Scale analysis, tonic detection
 Home-page: https://github.com/AnasGhrab/diastema
 Author: Anas Ghrab
@@ -103,4 +103,4 @@ Platform: UNKNOWN
 Classifier: Development Status :: 3 - Alpha
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Programming Language :: Python :: 2.7
-Classifier: Topic :: Musicology :: Analysis
+Classifier: Topic :: Multimedia :: Sound/Audio :: Analysis

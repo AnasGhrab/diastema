@@ -2,9 +2,8 @@ import numpy
 import matplotlib.pyplot as plt
 from scipy.stats.kde import gaussian_kde
 from scipy.stats.mstats import mode
+from scipy.spatial.distance import pdist
 from math import log10
-
-import epimores
 
 import glob, os.path, time, os
 
@@ -219,7 +218,8 @@ class Melodies(object):
 				self.melodies.append(Melodie(melodie,xmin,xmax))
 		
 		self.PdfCorr()
-		
+		self.GlobalPdf()
+
 	def pitch_extract(self):
 		"""Extrait les frequences f0 des tous les fichiers .wav du dossier"""
 
@@ -229,15 +229,18 @@ class Melodies(object):
 			self.file_pitch_extract(fichier_audio)
 		return
 
-	def PdfCorr(self):
+	def PdfCorr(self,out="pdist",metric='euclidean'):
 		"""Cree la matrice des coefficients de correlation a partir des pdfs, classe sur la premiere colonne
 
 		"""
 		PDFS = []
 		for i in range(0,len(self.melodies)):
 		    PDFS.append(self.melodies[i].pdf)
-		self.PdfCorr = numpy.corrcoef(PDFS)
-		return self.PdfCorr
+		if out=="numpy":
+			self.distances = numpy.corrcoef(PDFS)
+		if out=="pdist":
+			self.distances = pdist(PDFS,metric)
+		return self.distances
 
 	def PdfsPlot(self,allplots="Yes",gpdf="No"):
 		"""Dessine les PDFs de tous les fichiers
@@ -256,8 +259,8 @@ class Melodies(object):
 		"""Cree la matrice des coefficients de correlation a partir des pdfs
 
 		"""
-		R = self.PdfCorr
-		l = len(self.PdfCorr)
+		R = self.distances
+		l = len(self.distances)
 		plt.pcolor(R)
 		plt.colorbar()
 		plt.yticks(numpy.arange(0.5,l+0.5),range(1,l+1))
@@ -268,8 +271,7 @@ class Melodies(object):
 		"""PDF des similarites, basee sur la melodie i
 
 		"""
-		#self.PdfCorr = self.PdfCorr[:, self.PdfCorr[i].argsort()]
-		PdfCorrI = self.PdfCorr[i]
+		PdfCorrI = self.distances[i]
 		b = gaussian_kde(PdfCorrI)
 		x = numpy.arange(0,1,0.001)
 		Y = b(x)
@@ -279,7 +281,7 @@ class Melodies(object):
 		"""PDFs des similarites, basee sur toutes les SimPdf
 
 		"""
-		for i in range(0,len(self.PdfCorr)):
+		for i in range(0,len(self.distances)):
 			self.SimPdf(i)
 
 	def Intervals(self):
@@ -348,6 +350,7 @@ class Melodies(object):
 		"""Get a global scale from GlobalPeaks 
 
 		"""
+		print "Scale following the order of importance (peaks)"
 		P = self.GlobalPeaks()[:,0]
 		self.Echelle = []
 		for i in range(0,len(self.GP)):
@@ -372,7 +375,8 @@ def epi(list="No"):
 	         '2/1*9/8':2/1.*9/8.,'2/1*10/9':2/1.*10/9.,'2/1*12/11':2/1.*12/11.,
 	         '2/1':2/1.,'3/2*5/4':3/2.*5/4.,'3/2*6/5':3/2.*6/5.,'3/2*9/8':3/2.*9/8.,
 	         '3/2*10/9':3/2.*10/9.,'3/2':3/2.,'4/3':4/3.,'5/4':5/4.,'9/8*12/11':9/8.*12/11.,
-	          '6/5':6/5.,'9/8':9/8.,'10/9':10/9.,'12/11':12/11.,'1/1':1/1.,'16/15':16/15.}
+	          '6/5':6/5.,'7/6':7/6.,'8/7':8/7.,'9/8':9/8.,'10/9':10/9.,'11/10':11/10.,'12/11':12/11.,
+	          '13/12':13/12.,'14/13':14/13.,'15/14':15/14.,'16/15':16/15.,'1/1':1/1.}
 	if list=="Yes":
 		for i in range(0,len(inter)):
 			I = numpy.float32(log10(inter.values()[i])*1000)

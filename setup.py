@@ -21,6 +21,6 @@ setup(name='diastema',
       license='MIT',
       packages=['diastema'],
       install_requires=[
-          'numpy','matplotlib','essentia',
+          'numpy','matplotlib',
       ],
       zip_safe=False)

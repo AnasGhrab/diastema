@@ -2,6 +2,7 @@ import numpy
 import matplotlib.pyplot as plt
 from scipy.stats.kde import gaussian_kde
 from scipy.stats.mstats import mode
+from scipy.spatial.distance import pdist
 from math import log10
 
 import glob, os.path, time, os
@@ -15,12 +16,12 @@ numpy.set_printoptions(precision=4)
 class Melodie(object):
 	"""Une classe definissant une melodie et ses caracteristiques, a partir de la liste de ses frequences"""
 		
-	def __init__(self, file, xmin=0, xmax=500):
+	def __init__(self, file, xmin=0, xmax=500,freqref=300,transpose="No",bw_method=.1):
 		self.file_path = file
 		self.file_name = os.path.split(self.file_path)[1]
 		self.file_label = self.file_name.split(".")[0]
 		self.file_exten = self.file_name.split(".")[1]
-		self.freqref = 500
+		self.freqref = freqref
 		
 		self.xmin = xmin
 		self.xmax = xmax
@@ -29,15 +30,17 @@ class Melodie(object):
 		if self.file_exten == 'txt':
 			self.frequences = numpy.loadtxt(file)
 			self.freq = self.frequences[~numpy.isnan(self.frequences)]
-			#self.freqtransmode = self.transmode(self.freqref)
+			self.freqtransmode = self.transmode(self.freqref)
 
 			self.fmin = min(self.freq)
 			self.fmax = max(self.freq)
 			self.fmean = numpy.mean(self.freq)
 			self.fstd = numpy.std(self.freq)
 
-			#self.pdf = gaussian_kde(self.freqtransmode[~numpy.isnan(self.freqtransmode)],bw_method=.1)
-			self.pdf = gaussian_kde(self.freq[~numpy.isnan(self.freq)],bw_method=.1)
+			if transpode=="Yes":
+				self.pdf = gaussian_kde(self.freqtransmode[~numpy.isnan(self.freqtransmode)],bw_method)
+			if transpode=="No":
+				self.pdf = gaussian_kde(self.freq[~numpy.isnan(self.freq)],bw_method)
 			self.pdf = self.pdf(self.x)
 
 			self.peaks()
@@ -217,7 +220,8 @@ class Melodies(object):
 				self.melodies.append(Melodie(melodie,xmin,xmax))
 		
 		self.PdfCorr()
-		
+		self.GlobalPdf()
+
 	def pitch_extract(self):
 		"""Extrait les frequences f0 des tous les fichiers .wav du dossier"""
 
@@ -227,15 +231,18 @@ class Melodies(object):
 			self.file_pitch_extract(fichier_audio)
 		return
 
-	def PdfCorr(self):
+	def PdfCorr(self,out="pdist",metric='euclidean'):
 		"""Cree la matrice des coefficients de correlation a partir des pdfs, classe sur la premiere colonne
 
 		"""
 		PDFS = []
 		for i in range(0,len(self.melodies)):
 		    PDFS.append(self.melodies[i].pdf)
-		self.PdfCorr = numpy.corrcoef(PDFS)
-		return self.PdfCorr
+		if out=="numpy":
+			self.distances = numpy.corrcoef(PDFS)
+		if out=="pdist":
+			self.distances = pdist(PDFS,metric)
+		return self.distances
 
 	def PdfsPlot(self,allplots="Yes",gpdf="No"):
 		"""Dessine les PDFs de tous les fichiers
@@ -254,8 +261,8 @@ class Melodies(object):
 		"""Cree la matrice des coefficients de correlation a partir des pdfs
 
 		"""
-		R = self.PdfCorr
-		l = len(self.PdfCorr)
+		R = self.distances
+		l = len(self.distances)
 		plt.pcolor(R)
 		plt.colorbar()
 		plt.yticks(numpy.arange(0.5,l+0.5),range(1,l+1))
@@ -266,8 +273,7 @@ class Melodies(object):
 		"""PDF des similarites, basee sur la melodie i
 
 		"""
-		#self.PdfCorr = self.PdfCorr[:, self.PdfCorr[i].argsort()]
-		PdfCorrI = self.PdfCorr[i]
+		PdfCorrI = self.distances[i]
 		b = gaussian_kde(PdfCorrI)
 		x = numpy.arange(0,1,0.001)
 		Y = b(x)
@@ -277,7 +283,7 @@ class Melodies(object):
 		"""PDFs des similarites, basee sur toutes les SimPdf
 
 		"""
-		for i in range(0,len(self.PdfCorr)):
+		for i in range(0,len(self.distances)):
 			self.SimPdf(i)
 
 	def Intervals(self):
@@ -346,6 +352,7 @@ class Melodies(object):
 		"""Get a global scale from GlobalPeaks 
 
 		"""
+		print "Scale following the order of importance (peaks)"
 		P = self.GlobalPeaks()[:,0]
 		self.Echelle = []
 		for i in range(0,len(self.GP)):
