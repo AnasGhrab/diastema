@@ -2,7 +2,8 @@ import numpy
 import matplotlib.pyplot as plt
 from scipy.stats.kde import gaussian_kde
 from scipy.stats.mstats import mode
-from scipy.spatial.distance import pdist
+from scipy.spatial.distance import pdist, squareform
+from scipy.cluster.hierarchy import linkage,dendrogram
 from math import log10
 
 import glob, os.path, time, os
@@ -16,12 +17,12 @@ numpy.set_printoptions(precision=4)
 class Melodie(object):
 	"""Une classe definissant une melodie et ses caracteristiques, a partir de la liste de ses frequences"""
 		
-	def __init__(self, file, xmin=0, xmax=500):
+	def __init__(self, file, xmin=0, xmax=500,freqref=300,transpose="No",bw_method=.1):
 		self.file_path = file
 		self.file_name = os.path.split(self.file_path)[1]
 		self.file_label = self.file_name.split(".")[0]
 		self.file_exten = self.file_name.split(".")[1]
-		self.freqref = 500
+		self.freqref = freqref
 		
 		self.xmin = xmin
 		self.xmax = xmax
@@ -30,15 +31,17 @@ class Melodie(object):
 		if self.file_exten == 'txt':
 			self.frequences = numpy.loadtxt(file)
 			self.freq = self.frequences[~numpy.isnan(self.frequences)]
-			#self.freqtransmode = self.transmode(self.freqref)
+			self.freqtransmode = self.transmode(self.freqref)
 
 			self.fmin = min(self.freq)
 			self.fmax = max(self.freq)
 			self.fmean = numpy.mean(self.freq)
 			self.fstd = numpy.std(self.freq)
 
-			#self.pdf = gaussian_kde(self.freqtransmode[~numpy.isnan(self.freqtransmode)],bw_method=.1)
-			self.pdf = gaussian_kde(self.freq[~numpy.isnan(self.freq)],bw_method=.1)
+			if transpose=="Yes":
+				self.pdf = gaussian_kde(self.freqtransmode[~numpy.isnan(self.freqtransmode)],bw_method)
+			if transpose=="No":
+				self.pdf = gaussian_kde(self.freq[~numpy.isnan(self.freq)],bw_method)
 			self.pdf = self.pdf(self.x)
 
 			self.peaks()
@@ -115,13 +118,13 @@ class Melodie(object):
 
 		return self.ordredpeaks
 
-	# def transmode(self,freqref):
-	# 	"""Transpose all the frequencies by setting the mode on a given reference frequency
+	def transmode(self,freqref):
+	 	"""Transpose all the frequencies by setting the mode on a given reference frequency
 
-	# 	"""
-	# 	interv_transpo = mode(self.freq)[0]/freqref
-	# 	self.freqtransposed = self.freq / interv_transpo
-	# 	return self.freqtransposed
+	 	"""
+	 	interv_transpo = mode(self.freq)[0]/freqref
+	 	self.freqtransposed = self.freq / interv_transpo
+	 	return self.freqtransposed
 
 	def tonique(self,percent=0.5,method="mode"):
 		"""
@@ -192,7 +195,7 @@ class Melodies(object):
 		- path : un dossier contenant les fichiers .wav ou .txt
 	"""
 
-	def __init__(self, path,xmin=0,xmax=500):
+	def __init__(self, path,xmin=0,xmax=500,freqref=300,transpose="No",bw_method=.1):
 		self.path = path  # L'adresse obtenu = un dossier
 #		self.exten = exten
 		try:
@@ -208,17 +211,27 @@ class Melodies(object):
 		if len(self.folder_txt) == len(self.folder_wav):
 			print 'Lecture et analyse de ',len(self.folder_wav),' fichiers (.txt) dans le dossier :',self.path
 			for melodie in self.folder_txt:
-				self.melodies.append(Melodie(melodie,xmin,xmax))
+				self.melodies.append(Melodie(melodie,xmin,xmax,freqref,transpose,bw_method))
 			#self.Simatrix()
 		else:
 			print 'Analyse de ',len(self.folder_wav),' fichiers Audio (.wav) dans le dossier :'
 			for melodie in self.folder_wav:
-				self.melodies.append(Melodie(melodie,xmin,xmax))
+				self.melodies.append(Melodie(melodie,xmin,xmax,freqref,transpose,bw_method))
 			for melodie in self.folder_txt:
-				self.melodies.append(Melodie(melodie,xmin,xmax))
+				self.melodies.append(Melodie(melodie,xmin,xmax,freqref,transpose,bw_method))
 		
 		self.PdfCorr()
 		self.GlobalPdf()
+		self.GetFileLabels()
+
+	def GetFileLabels(self):
+		"""Get all filenames as labels
+
+		"""
+		self.file_names = []
+		for i in range(0,len(self.melodies)):
+			self.file_names.append(self.melodies[i].file_label)
+		return self.file_names
 
 	def pitch_extract(self):
 		"""Extrait les frequences f0 des tous les fichiers .wav du dossier"""
@@ -259,7 +272,7 @@ class Melodies(object):
 		"""Cree la matrice des coefficients de correlation a partir des pdfs
 
 		"""
-		R = self.distances
+		R = squareform(self.distances)
 		l = len(self.distances)
 		plt.pcolor(R)
 		plt.colorbar()
