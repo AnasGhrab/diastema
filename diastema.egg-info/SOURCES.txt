@@ -2,6 +2,7 @@ README.rst
 setup.py
 diastema/__init__.py
 diastema/diastema.py
+diastema/extractor_predominantmelody.py
 diastema.egg-info/PKG-INFO
 diastema.egg-info/SOURCES.txt
 diastema.egg-info/dependency_links.txt
