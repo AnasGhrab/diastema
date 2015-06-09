@@ -5,7 +5,7 @@ def readme():
         return f.read()
 
 setup(name='diastema',
-      version='0.0.3',
+      version='0.0.4',
       description='A tool for modal music analysis : Scale analysis, tonic detection',
       long_description=readme(),
       classifiers=[

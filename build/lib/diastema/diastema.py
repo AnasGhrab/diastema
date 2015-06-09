@@ -89,7 +89,6 @@ class Melodie(object):
 		pitch, confidence = melodie(audio) 
 		pitch[pitch==0]=numpy.nan
 
-		print self.folder_path
 		try:
 		    os.makedirs(self.folder_path+'txt/')
 		except OSError:
@@ -186,7 +185,7 @@ class Melodie(object):
 
 			self.final_pdf = gaussian_kde(Final_Freqs)
 			lmax= numpy.argmax(self.final_pdf(self.x))+self.xmin
-			plt.plot(self.x,self.final_pdf(self.x))
+			#plt.plot(self.x,self.final_pdf(self.x))
 			return self.final_pdf,lmax,Final_Freqs
 
 		if method=="mode":
@@ -197,7 +196,7 @@ class Melodie(object):
 				N = M[0]*2
 			else:
 				N = M[0]
-			return M[0],N.tolist()[0],Final_Freqs
+			return M[0],int(N.tolist()[0]),Final_Freqs
 
 	def get_intervals(self,percent=0.5,method="mode",unit="savart"):
 		"""
@@ -318,9 +317,9 @@ class Melodies(object):
 		plt.figure(figsize=(16,8))
 
 		if self.transpose == "Yes":	
-			plt.suptitle("Transposed on : "+str(self.freqref))
+			plt.suptitle("Transposed on : "+str(self.freqref)+" - bw_method = "+str(self.bw_method))
 		if self.transpose == "No":	
-			plt.suptitle("Not transposed")
+			plt.suptitle("Not transposed"+" - bw_method = "+str(self.bw_method))
 
 		if allplots == "Yes":
 			for melodie_pdf in self.melodies:
