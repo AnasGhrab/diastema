@@ -2,9 +2,9 @@ import numpy
 import matplotlib.pyplot as plt
 from scipy.stats.kde import gaussian_kde
 from scipy.stats.mstats import mode
+from scipy.spatial.distance import pdist, squareform
+from scipy.cluster.hierarchy import linkage,dendrogram
 from math import log10
-
-import epimores
 
 import glob, os.path, time, os
 
@@ -15,54 +15,94 @@ from essentia.standard import * # Importer toutes les fonctions du module **stan
 numpy.set_printoptions(precision=4)
 
 class Melodie(object):
-	"""Une classe definissant une melodie et ses caracteristiques, a partir de la liste de ses frequences"""
+	"""Une classe definissant une melodie et ses caracteristiques
+
+	:params Audio file to be analysed or a text file containing frequencies to be analysed
+	:return An object Melodie containing ...
+	"""
 		
-	def __init__(self, file, xmin=0, xmax=500):
+	def __init__(self, file,
+					xmin=0, xmax=500,
+					minFrequency=55, maxFrequency=600,
+					freqref=300, bw_method=.1,
+					percent=0.5,method="mode",
+					transpose="No",transpositionref= "mode",
+					):
 		self.file_path = file
+		self.folder_path = os.path.split(self.file_path)[0]+'/'
 		self.file_name = os.path.split(self.file_path)[1]
 		self.file_label = self.file_name.split(".")[0]
 		self.file_exten = self.file_name.split(".")[1]
-		self.freqref = 500
 		
+		self.minFrequency = minFrequency
+		self.maxFrequency = maxFrequency
+
+		self.percent = percent
+		self.method = method
+		self.freqref = freqref
+		self.transpose = transpose
+		self.transpositionref = transpositionref
+		self.bw_method = bw_method
+
 		self.xmin = xmin
 		self.xmax = xmax
-		self.x = numpy.linspace(self.xmin,self.xmax,self.xmax-self.xmin)
+
+		self.x = numpy.linspace(self.xmin,self.xmax,self.xmax-self.xmin)			
+
+		self.frequences = numpy.loadtxt(file)
+		self.n_frames = len(self.frequences)
+
+		self.freq = self.frequences[~numpy.isnan(self.frequences)]
+		self.fmin = min(self.freq)
+		self.fmax = max(self.freq)
+		self.fmean = numpy.mean(self.freq)
+		self.fstd = numpy.std(self.freq)
 
 		if self.file_exten == 'txt':
-			self.frequences = numpy.loadtxt(file)
-			self.freq = self.frequences[~numpy.isnan(self.frequences)]
-			#self.freqtransmode = self.transmode(self.freqref)
-
-			self.fmin = min(self.freq)
-			self.fmax = max(self.freq)
-			self.fmean = numpy.mean(self.freq)
-			self.fstd = numpy.std(self.freq)
-
-			#self.pdf = gaussian_kde(self.freqtransmode[~numpy.isnan(self.freqtransmode)],bw_method=.1)
-			self.pdf = gaussian_kde(self.freq[~numpy.isnan(self.freq)],bw_method=.1)
-			self.pdf = self.pdf(self.x)
-
-			self.peaks()
+			self.analyse()
 
 		if self.file_exten == 'wav':
-			self.file_pitch_extract(self.file_path)
+			self.file_pitch_extract()
 
 	def __str__(self):
 		return "File : %s" % (self.file_name)
 
+	def analyse(self):
+
+			if self.transpose=="Yes":
+				self.freqtransmode = self.transmode()
+				print self.file_name,"(transposed)"
+				self.pdf = gaussian_kde(self.freqtransmode[~numpy.isnan(self.freqtransmode)],self.bw_method)
+			if self.transpose=="No":
+				print self.file_name,"(not transposed)"
+				self.pdf = gaussian_kde(self.freq[~numpy.isnan(self.freq)],self.bw_method)
+			self.pdf = self.pdf(self.x)
+
+			self.peaks()
+
 	def file_pitch_extract(self,file):
 		"""Extraction des frequences avec PredominantMelody()
-		Le resultat est un fichier .txt"""
+		Le resultat est un fichier .txt
+
+		:params file .wav File to analyse
+		:return extranted frequencies in a /txt/ folder
+		"""
 
 		start = time.time()
 		print start,' : Extraction des f0 de ',self.file_name
 
 		audio = MonoLoader(filename = file)() # creation de l'instance
-		melodie = PredominantMelody() # creation de l'instance
+		melodie = PredominantMelody(minFrequency=self.minFrequency, maxFrequency = self.maxFrequency) # creation de l'instance
 		pitch, confidence = melodie(audio) 
 		pitch[pitch==0]=numpy.nan
+
+		try:
+		    os.makedirs(self.folder_path+'txt/')
+		except OSError:
+		    pass
+
 		nom_fichier = self.file_name.replace("wav", "txt");
-		numpy.savetxt(os.path.split(self.file_path)[0]+'/txt/'+nom_fichier,pitch,fmt='%1.3f')
+		numpy.savetxt(self.folder_path+'txt/'+nom_fichier,pitch,fmt='%1.3f')
 
 		end = time.time()
 		print 'Fichier',self.file_label,'analyse (',end - start,') secondes'
@@ -116,15 +156,28 @@ class Melodie(object):
 
 		return self.ordredpeaks
 
-	# def transmode(self,freqref):
-	# 	"""Transpose all the frequencies by setting the mode on a given reference frequency
+	def transmode(self):
+	 	"""Transpose all the frequencies by setting the mode on a given reference frequency
 
-	# 	"""
-	# 	interv_transpo = mode(self.freq)[0]/freqref
-	# 	self.freqtransposed = self.freq / interv_transpo
-	# 	return self.freqtransposed
+	 	:params freqref : The frequency reference to be transposed to. Default = 300 ?
+	 	ref : The note reference : mode or tonic. Default = mode
+	 	: return the transposed frequencies
+	 	"""
 
-	def tonique(self,percent=0.5,method="mode"):
+	 	if self.transpositionref=="mode":
+		 	interv_transpo = mode(self.freq)[0]/self.freqref
+		if self.transpositionref=="tonic":
+			T = float(self.tonique(self.percent,self.method)[1])
+			print "Tonic :",T
+			if T > self.freqref :
+				interv_transpo = T/self.freqref
+			if T < self.freqref :
+				interv_transpo = self.freqref/T
+		print "Intervalle de tranposition :",interv_transpo
+	 	self.freqtransposed = self.freq / interv_transpo
+	 	return self.freqtransposed
+
+	def tonique(self,percent,method):
 		"""
 		Get the tonic frequency defined as the mode of the last frequencies array.
 		These as selected by the percent argument. Two methods are possible : pdf or mode.
@@ -141,21 +194,24 @@ class Melodie(object):
 			N : the mode converted inside an octave
 			Final_Freqs : the last frequencies according to the percentage
 		"""
+		self.percent = percent
+		self.method = method
+
 		L = len(self.freq)
-		Nb_Frames = L*percent/100
+		Nb_Frames = L*self.percent/100
 		Final_Freqs = self.freq[(L-Nb_Frames):L]
 
-		if method=="pdf":
+		if self.method=="pdf":
 			# Down to the same octave centered on the mode
-			Final_Freqs[Final_Freqs>mode(self.freq)[0]*2] = Final_Freqs[Final_Freqs>mode(self.freq)[0]*2]/2.
-			Final_Freqs[Final_Freqs<(mode(self.freq)[0]/2.)] = Final_Freqs[Final_Freqs<mode(self.freq)[0]/2.]*2
+			#Final_Freqs[Final_Freqs>mode(self.freq)[0]*2] = Final_Freqs[Final_Freqs>mode(self.freq)[0]*2]/2.
+			#Final_Freqs[Final_Freqs<(mode(self.freq)[0]/2.)] = Final_Freqs[Final_Freqs<mode(self.freq)[0]/2.]*2
 
 			self.final_pdf = gaussian_kde(Final_Freqs)
 			lmax= numpy.argmax(self.final_pdf(self.x))+self.xmin
-			#plt.plot(x,self.final_pdf(x))
+			#plt.plot(self.x,self.final_pdf(self.x))
 			return self.final_pdf,lmax,Final_Freqs
 
-		if method=="mode":
+		if self.method=="mode":
 			M = mode(Final_Freqs)
 			if M[0] > mode(self.freq)[0]*2:
 				N = M[0]/2
@@ -163,7 +219,7 @@ class Melodie(object):
 				N = M[0]*2
 			else:
 				N = M[0]
-			return M[0],N.tolist()[0],Final_Freqs
+			return M[0],int(N.tolist()[0]),Final_Freqs
 
 	def get_intervals(self,percent=0.5,method="mode",unit="savart"):
 		"""
@@ -186,6 +242,30 @@ class Melodie(object):
 			self.intervals = (numpy.log2(self.ordredpeaks[:,0]/self.tonique(percent,method)[1]))*1200
 		return self.intervals
 
+	def plot(self):
+		"""
+		Plots the melody frequencies
+
+		"""
+		# Visualize output pitch values
+		hopSize = 128
+		frameSize = 2048
+		sampleRate = 44100
+
+		n_frames = self.n_frames
+		fig = plt.figure(figsize=(16,8))
+		plt.plot(range(self.n_frames), self.frequences, 'bo')
+		n_ticks = 10
+		xtick_locs = [i * (n_frames / 10.0) for i in range(n_ticks)]
+		xtick_lbls = [i * (n_frames / 10.0) * hopSize / sampleRate for i in range(n_ticks)]
+		xtick_lbls = ["%.2f" % round(x,2) for x in xtick_lbls]
+		plt.xticks(xtick_locs, xtick_lbls)
+		ax = fig.add_subplot(111)
+		ax.set_xlabel('Time (s)')
+		ax.set_ylabel('Pitch (Hz)')
+		plt.suptitle(self.file_label)
+
+
 class Melodies(object):
 	"""Une classe definissant un ensemble de melodies, leur degre d'homogeneite et de proximite
 
@@ -193,56 +273,81 @@ class Melodies(object):
 		- path : un dossier contenant les fichiers .wav ou .txt
 	"""
 
-	def __init__(self, path,xmin=0,xmax=500):
+	def __init__(self, path,xmin=0,xmax=600,minFrequency=55,maxFrequency=600,freqref=300,transpose="No",transpositionref="mode",bw_method=.1):
 		self.path = path  # L'adresse obtenu = un dossier
-#		self.exten = exten
-		try:
-		    os.makedirs(self.path+'txt/')
-		except OSError:
-		    pass
+		self.xmin = xmin
+		self.xmax = xmax
+		self.minFrequency = minFrequency
+		self.maxFrequency = maxFrequency
+		self.freqref = freqref
+		self.transpose = transpose
+		self.transpositionref= transpositionref
+		self.bw_method = bw_method
 
-		self.folder_txt = glob.glob(path+'txt/'+'*.txt')  # Tous les fichiers .txt du dossier
-		self.folder_wav = glob.glob(path+'*.wav')  # Tous les fichiers .wav du dossier
+		folder_txt = glob.glob(path+'txt/'+'*.txt')  # Tous les fichiers .txt du dossier
+		folder_wav = glob.glob(path+'*.wav')  # Tous les fichiers .wav du dossier
 
 		self.melodies = []
-
-		if len(self.folder_txt) == len(self.folder_wav):
-			print 'Lecture et analyse de ',len(self.folder_wav),' fichiers (.txt) dans le dossier :',self.path
-			for melodie in self.folder_txt:
-				self.melodies.append(Melodie(melodie,xmin,xmax))
-			#self.Simatrix()
+		if len(folder_txt) == len(folder_wav):
+		 	print 'Lecture et analyse de ',len(folder_wav),' fichiers (.txt) dans le dossier :',self.path
+		 	if self.transpose == "Yes" :
+			 	print "Tranposing the ",self.transpositionref," to ",self.freqref, "Hz."
+			for txt_file in folder_txt:
+				self.melodies.append(Melodie(txt_file,xmin=self.xmin,xmax=self.xmax,
+					freqref=self.freqref,transpose=self.transpose,transpositionref=self.transpositionref,
+					bw_method=self.bw_method))
 		else:
-			print 'Analyse de ',len(self.folder_wav),' fichiers Audio (.wav) dans le dossier :'
-			for melodie in self.folder_wav:
-				self.melodies.append(Melodie(melodie,xmin,xmax))
-			for melodie in self.folder_txt:
-				self.melodies.append(Melodie(melodie,xmin,xmax))
+			print 'Analyse de ',len(folder_wav),' fichiers Audio (.wav) dans le dossier :'
+			for wav_file in folder_wav:
+				Melodie(wav_file,minFrequency=self.minFrequency,maxFrequency=self.maxFrequency)
 		
-		self.PdfCorr()
+		# self.PdfCorr()
+		# self.GlobalPdf()
+		self.GetFileLabels()
 		
-	def pitch_extract(self):
-		"""Extrait les frequences f0 des tous les fichiers .wav du dossier"""
 
-		files = glob.glob(self.path+'*.wav')
-		#fichiers = []
-		for fichier_audio in self.melodies:
-			self.file_pitch_extract(fichier_audio)
-		return
+	def GetFileLabels(self):
+		"""Get all filenames as labels
 
-	def PdfCorr(self):
+		"""
+		self.file_names = []
+		for i in range(0,len(self.melodies)):
+			self.file_names.append(self.melodies[i].file_label)
+		return self.file_names
+
+	# def pitch_extract(self):
+	# 	"""Extrait les frequences f0 des tous les fichiers .wav du dossier"""
+
+	# 	files = glob.glob(self.path+'*.wav')
+	# 	#fichiers = []
+	# 	for fichier_audio in self.melodies:
+	# 		self.file_pitch_extract(fichier_audio)
+	# 	return
+
+	def PdfCorr(self,out="pdist",metric='euclidean'):
 		"""Cree la matrice des coefficients de correlation a partir des pdfs, classe sur la premiere colonne
 
 		"""
 		PDFS = []
 		for i in range(0,len(self.melodies)):
 		    PDFS.append(self.melodies[i].pdf)
-		self.PdfCorr = numpy.corrcoef(PDFS)
-		return self.PdfCorr
+		if out=="numpy":
+			self.distances = numpy.corrcoef(PDFS)
+		if out=="pdist":
+			self.distances = pdist(PDFS,metric)
+		return self.distances
 
 	def PdfsPlot(self,allplots="Yes",gpdf="No"):
 		"""Dessine les PDFs de tous les fichiers
 
 		"""
+		plt.figure(figsize=(16,8))
+
+		if self.transpose == "Yes":	
+			plt.suptitle(str(self.transpositionref)+" transposed on : "+str(self.freqref)+" , "+" - bw_method = "+str(self.bw_method))
+		if self.transpose == "No":	
+			plt.suptitle("Not transposed"+" - bw_method = "+str(self.bw_method))
+
 		if allplots == "Yes":
 			for melodie_pdf in self.melodies:
 				melodie_pdf.pdf_show()
@@ -256,8 +361,8 @@ class Melodies(object):
 		"""Cree la matrice des coefficients de correlation a partir des pdfs
 
 		"""
-		R = self.PdfCorr
-		l = len(self.PdfCorr)
+		R = squareform(self.distances)
+		l = len(self.distances)
 		plt.pcolor(R)
 		plt.colorbar()
 		plt.yticks(numpy.arange(0.5,l+0.5),range(1,l+1))
@@ -268,8 +373,7 @@ class Melodies(object):
 		"""PDF des similarites, basee sur la melodie i
 
 		"""
-		#self.PdfCorr = self.PdfCorr[:, self.PdfCorr[i].argsort()]
-		PdfCorrI = self.PdfCorr[i]
+		PdfCorrI = self.distances[i]
 		b = gaussian_kde(PdfCorrI)
 		x = numpy.arange(0,1,0.001)
 		Y = b(x)
@@ -279,7 +383,7 @@ class Melodies(object):
 		"""PDFs des similarites, basee sur toutes les SimPdf
 
 		"""
-		for i in range(0,len(self.PdfCorr)):
+		for i in range(0,len(self.distances)):
 			self.SimPdf(i)
 
 	def Intervals(self):
@@ -291,15 +395,15 @@ class Melodies(object):
 			self.Intervals.append(self.melodies[i].get_intervals())
 		return self.Intervals
 
-	def AllTonics(self,percentages,method="pdf"):
+	def AllTonics(self,percentages,method):
 		"""Get all tonics with different percentages
 
 		"""
 		for i in range(0,len(self.melodies)):
 			phrase = []
 			for j in percentages:
-				phrase.append(self.melodies[i].tonique(j, method)[1])
-			print 'Toniques possibles de la Phrase', i, ' : ', phrase	
+				phrase.append(self.melodies[i].tonique(percent=j,method=method)[1])
+			print 'Toniques possibles de la Phrase', self.melodies[i].file_label, ' : ', phrase	
 		return
 
 	def GlobalPdf(self):
@@ -348,6 +452,7 @@ class Melodies(object):
 		"""Get a global scale from GlobalPeaks 
 
 		"""
+		print "Scale following the order of importance (peaks)"
 		P = self.GlobalPeaks()[:,0]
 		self.Echelle = []
 		for i in range(0,len(self.GP)):
@@ -372,7 +477,8 @@ def epi(list="No"):
 	         '2/1*9/8':2/1.*9/8.,'2/1*10/9':2/1.*10/9.,'2/1*12/11':2/1.*12/11.,
 	         '2/1':2/1.,'3/2*5/4':3/2.*5/4.,'3/2*6/5':3/2.*6/5.,'3/2*9/8':3/2.*9/8.,
 	         '3/2*10/9':3/2.*10/9.,'3/2':3/2.,'4/3':4/3.,'5/4':5/4.,'9/8*12/11':9/8.*12/11.,
-	          '6/5':6/5.,'9/8':9/8.,'10/9':10/9.,'12/11':12/11.,'1/1':1/1.,'16/15':16/15.}
+	          '6/5':6/5.,'7/6':7/6.,'8/7':8/7.,'9/8':9/8.,'10/9':10/9.,'11/10':11/10.,'12/11':12/11.,
+	          '13/12':13/12.,'14/13':14/13.,'15/14':15/14.,'16/15':16/15.,'1/1':1/1.}
 	if list=="Yes":
 		for i in range(0,len(inter)):
 			I = numpy.float32(log10(inter.values()[i])*1000)
