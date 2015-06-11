@@ -25,7 +25,8 @@ class Melodie(object):
 					xmin=0, xmax=500,
 					minFrequency=55, maxFrequency=600,
 					freqref=300, bw_method=.1,
-					transpose="No"
+					percent=0.5,method="mode",
+					transpose="No",transpositionref= "mode",
 					):
 		self.file_path = file
 		self.folder_path = os.path.split(self.file_path)[0]+'/'
@@ -33,47 +34,53 @@ class Melodie(object):
 		self.file_label = self.file_name.split(".")[0]
 		self.file_exten = self.file_name.split(".")[1]
 		
+		self.minFrequency = minFrequency
+		self.maxFrequency = maxFrequency
+
+		self.percent = percent
+		self.method = method
+		self.freqref = freqref
+		self.transpose = transpose
+		self.transpositionref = transpositionref
+		self.bw_method = bw_method
+
+		self.xmin = xmin
+		self.xmax = xmax
+
+		self.x = numpy.linspace(self.xmin,self.xmax,self.xmax-self.xmin)			
+
+		self.frequences = numpy.loadtxt(file)
+		self.n_frames = len(self.frequences)
+
+		self.freq = self.frequences[~numpy.isnan(self.frequences)]
+		self.fmin = min(self.freq)
+		self.fmax = max(self.freq)
+		self.fmean = numpy.mean(self.freq)
+		self.fstd = numpy.std(self.freq)
 
 		if self.file_exten == 'txt':
-			self.analyse(self.file_path,xmin,xmax,freqref,transpose,bw_method)
+			self.analyse()
 
 		if self.file_exten == 'wav':
-			self.file_pitch_extract(self.file_path,minFrequency,maxFrequency)
+			self.file_pitch_extract()
 
 	def __str__(self):
 		return "File : %s" % (self.file_name)
 
-	def analyse(self,file,xmin,xmax,freqref,transpose,bw_method):
-
-			self.xmin = xmin
-			self.xmax = xmax
-			self.freqref = freqref
-			self.transpose = transpose
-			self.bw_method = bw_method
-
-			self.x = numpy.linspace(self.xmin,self.xmax,self.xmax-self.xmin)			
-
-			self.frequences = numpy.loadtxt(file)
-			self.freq = self.frequences[~numpy.isnan(self.frequences)]
-			self.freqtransmode = self.transmode(self.freqref)
-			self.n_frames = len(self.frequences)
-
-			self.fmin = min(self.freq)
-			self.fmax = max(self.freq)
-			self.fmean = numpy.mean(self.freq)
-			self.fstd = numpy.std(self.freq)
+	def analyse(self):
 
 			if self.transpose=="Yes":
+				self.freqtransmode = self.transmode()
 				print self.file_name,"(transposed)"
-				self.pdf = gaussian_kde(self.freqtransmode[~numpy.isnan(self.freqtransmode)],bw_method)
+				self.pdf = gaussian_kde(self.freqtransmode[~numpy.isnan(self.freqtransmode)],self.bw_method)
 			if self.transpose=="No":
 				print self.file_name,"(not transposed)"
-				self.pdf = gaussian_kde(self.freq[~numpy.isnan(self.freq)],bw_method)
+				self.pdf = gaussian_kde(self.freq[~numpy.isnan(self.freq)],self.bw_method)
 			self.pdf = self.pdf(self.x)
 
 			self.peaks()
 
-	def file_pitch_extract(self,file,minFrequency,maxFrequency):
+	def file_pitch_extract(self,file):
 		"""Extraction des frequences avec PredominantMelody()
 		Le resultat est un fichier .txt
 
@@ -85,7 +92,7 @@ class Melodie(object):
 		print start,' : Extraction des f0 de ',self.file_name
 
 		audio = MonoLoader(filename = file)() # creation de l'instance
-		melodie = PredominantMelody(minFrequency=minFrequency, maxFrequency = maxFrequency) # creation de l'instance
+		melodie = PredominantMelody(minFrequency=self.minFrequency, maxFrequency = self.maxFrequency) # creation de l'instance
 		pitch, confidence = melodie(audio) 
 		pitch[pitch==0]=numpy.nan
 
@@ -149,15 +156,30 @@ class Melodie(object):
 
 		return self.ordredpeaks
 
-	def transmode(self,freqref):
+	def transmode(self):
 	 	"""Transpose all the frequencies by setting the mode on a given reference frequency
 
+	 	:params freqref : The frequency reference to be transposed to. Default = 300 ?
+	 	ref : The note reference : mode or tonic. Default = mode
+	 	: return the transposed frequencies
 	 	"""
-	 	interv_transpo = mode(self.freq)[0]/freqref
+
+	 	print self.transpose,"tranposing the ",self.transpositionref," to ",self.freqref, "Hz."
+
+	 	if self.transpositionref=="mode":
+		 	interv_transpo = mode(self.freq)[0]/self.freqref
+		if self.transpositionref=="tonic":
+			T = float(self.tonique(self.percent,self.method)[1])
+			print "Tonic :",T
+			if T > self.freqref :
+				interv_transpo = T/self.freqref
+			if T < self.freqref :
+				interv_transpo = self.freqref/T
+		print "Intervalle de tranposition :",interv_transpo
 	 	self.freqtransposed = self.freq / interv_transpo
 	 	return self.freqtransposed
 
-	def tonique(self,percent=0.5,method="mode"):
+	def tonique(self,percent,method):
 		"""
 		Get the tonic frequency defined as the mode of the last frequencies array.
 		These as selected by the percent argument. Two methods are possible : pdf or mode.
@@ -174,11 +196,14 @@ class Melodie(object):
 			N : the mode converted inside an octave
 			Final_Freqs : the last frequencies according to the percentage
 		"""
+		self.percent = percent
+		self.method = method
+
 		L = len(self.freq)
-		Nb_Frames = L*percent/100
+		Nb_Frames = L*self.percent/100
 		Final_Freqs = self.freq[(L-Nb_Frames):L]
 
-		if method=="pdf":
+		if self.method=="pdf":
 			# Down to the same octave centered on the mode
 			#Final_Freqs[Final_Freqs>mode(self.freq)[0]*2] = Final_Freqs[Final_Freqs>mode(self.freq)[0]*2]/2.
 			#Final_Freqs[Final_Freqs<(mode(self.freq)[0]/2.)] = Final_Freqs[Final_Freqs<mode(self.freq)[0]/2.]*2
@@ -188,7 +213,7 @@ class Melodie(object):
 			#plt.plot(self.x,self.final_pdf(self.x))
 			return self.final_pdf,lmax,Final_Freqs
 
-		if method=="mode":
+		if self.method=="mode":
 			M = mode(Final_Freqs)
 			if M[0] > mode(self.freq)[0]*2:
 				N = M[0]/2
@@ -250,7 +275,7 @@ class Melodies(object):
 		- path : un dossier contenant les fichiers .wav ou .txt
 	"""
 
-	def __init__(self, path,xmin=0,xmax=600,minFrequency=55,maxFrequency=600,freqref=300,transpose="No",bw_method=.1):
+	def __init__(self, path,xmin=0,xmax=600,minFrequency=55,maxFrequency=600,freqref=300,transpose="No",transpositionref="mode",bw_method=.1):
 		self.path = path  # L'adresse obtenu = un dossier
 		self.xmin = xmin
 		self.xmax = xmax
@@ -258,6 +283,7 @@ class Melodies(object):
 		self.maxFrequency = maxFrequency
 		self.freqref = freqref
 		self.transpose = transpose
+		self.transpositionref= transpositionref
 		self.bw_method = bw_method
 
 		folder_txt = glob.glob(path+'txt/'+'*.txt')  # Tous les fichiers .txt du dossier
@@ -268,7 +294,8 @@ class Melodies(object):
 		 	print 'Lecture et analyse de ',len(folder_wav),' fichiers (.txt) dans le dossier :',self.path
 			for txt_file in folder_txt:
 				self.melodies.append(Melodie(txt_file,xmin=self.xmin,xmax=self.xmax,
-					freqref=self.freqref,transpose=self.transpose,bw_method=self.bw_method))
+					freqref=self.freqref,transpose=self.transpose,transpositionref=self.transpositionref,
+					bw_method=self.bw_method))
 		else:
 			print 'Analyse de ',len(folder_wav),' fichiers Audio (.wav) dans le dossier :'
 			for wav_file in folder_wav:
@@ -317,7 +344,7 @@ class Melodies(object):
 		plt.figure(figsize=(16,8))
 
 		if self.transpose == "Yes":	
-			plt.suptitle("Transposed on : "+str(self.freqref)+" - bw_method = "+str(self.bw_method))
+			plt.suptitle(str(self.transpositionref)+" transposed on : "+str(self.freqref)+" , "+" - bw_method = "+str(self.bw_method))
 		if self.transpose == "No":	
 			plt.suptitle("Not transposed"+" - bw_method = "+str(self.bw_method))
 
@@ -368,14 +395,14 @@ class Melodies(object):
 			self.Intervals.append(self.melodies[i].get_intervals())
 		return self.Intervals
 
-	def AllTonics(self,percentages,method="pdf"):
+	def AllTonics(self,percentages,method):
 		"""Get all tonics with different percentages
 
 		"""
 		for i in range(0,len(self.melodies)):
 			phrase = []
 			for j in percentages:
-				phrase.append(self.melodies[i].tonique(j, method)[1])
+				phrase.append(self.melodies[i].tonique(percent=j,method=method)[1])
 			print 'Toniques possibles de la Phrase', self.melodies[i].file_label, ' : ', phrase	
 		return
 
