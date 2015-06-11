@@ -164,8 +164,6 @@ class Melodie(object):
 	 	: return the transposed frequencies
 	 	"""
 
-	 	print self.transpose,"tranposing the ",self.transpositionref," to ",self.freqref, "Hz."
-
 	 	if self.transpositionref=="mode":
 		 	interv_transpo = mode(self.freq)[0]/self.freqref
 		if self.transpositionref=="tonic":
@@ -292,6 +290,8 @@ class Melodies(object):
 		self.melodies = []
 		if len(folder_txt) == len(folder_wav):
 		 	print 'Lecture et analyse de ',len(folder_wav),' fichiers (.txt) dans le dossier :',self.path
+		 	if self.transpose == "Yes" :
+			 	print "Tranposing the ",self.transpositionref," to ",self.freqref, "Hz."
 			for txt_file in folder_txt:
 				self.melodies.append(Melodie(txt_file,xmin=self.xmin,xmax=self.xmax,
 					freqref=self.freqref,transpose=self.transpose,transpositionref=self.transpositionref,
