@@ -324,16 +324,13 @@ class Melodies(object):
 	# 		self.file_pitch_extract(fichier_audio)
 	# 	return
 
-	def PdfCorr(self,out="pdist",metric='euclidean'):
+	def PdfCorr(self,metric='euclidean'):
 		"""Cree la matrice des coefficients de correlation a partir des pdfs, classe sur la premiere colonne
 
 		"""
 		PDFS = []
 		for i in range(0,len(self.melodies)):
-		    PDFS.append(self.melodies[i].pdf)
-		if out=="numpy":
-			self.distances = numpy.corrcoef(PDFS)
-		if out=="pdist":
+			PDFS.append(self.melodies[i].pdf)
 			self.distances = pdist(PDFS,metric)
 		return self.distances
 
@@ -341,7 +338,7 @@ class Melodies(object):
 		"""Dessine les PDFs de tous les fichiers
 
 		"""
-		plt.figure(figsize=(16,8))
+		fig = plt.figure(figsize=(16,8))
 
 		if self.transpose == "Yes":	
 			plt.suptitle(str(self.transpositionref)+" transposed on : "+str(self.freqref)+" , "+" - bw_method = "+str(self.bw_method))
@@ -355,6 +352,10 @@ class Melodies(object):
 			self.GlobalPdf()
 			self.GPDF_show()
 			#plt.plot(self.melodies[0].x,self.GPDF,label="GPDF")
+		ax = fig.add_subplot(111)
+		ax.set_ylabel('Probability')
+		ax.set_xlabel('Pitch (Hz)')
+                plt.suptitle("Toutes les FDP-s")
 		return plt.show()
 
 	def Simatrix(self):
@@ -514,3 +515,19 @@ def Inters(Echelle):
 	    else: signe  = '-'
 	    Intervalles.append(["{:.2f}".format(Echelle[i]),Nom_Intervalle_Proche,signe, Difference])
 	return Intervalles
+
+
+ 
+def kl(p, q):
+    """Kullback-Leibler divergence D(P || Q) for discrete distributions
+	https://gist.github.com/larsmans/3104581
+
+    Parameters
+    ----------
+    p, q : array-like, dtype=float, shape=n
+        Discrete probability distributions.
+    """
+    p = numpy.asarray(p, dtype=numpy.float)
+    q = numpy.asarray(q, dtype=numpy.float)
+ 
+    return numpy.sum(numpy.where(p != 0, p * numpy.log(p / q), 0))
