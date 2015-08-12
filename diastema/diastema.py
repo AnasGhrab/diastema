@@ -59,7 +59,7 @@ class Melodie(object):
 		self.fstd = numpy.std(self.freq)
 
 		if self.file_exten == 'txt':
-			self.analyse()
+            self.analyse()
 
 		if self.file_exten == 'wav':
 			self.file_pitch_extract()
