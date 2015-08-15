@@ -500,7 +500,6 @@ def Inters(Echelle):
 	for i in range(0,len(I)):
 	     Int.append(log10(I[i])*1000)
 	        
-	        
 	Intervalles = []
 	for i in range(0,len(Echelle)):
 	    dist = []
