@@ -1,0 +1,41 @@
+actionid: py27
+msg: installpkg
+cmdargs: [local('/Users/anas/python/diastema/.tox/py27/bin/pip'), 'install', '/Users/anas/python/diastema/.tox/dist/diastema-0.0.4.zip']
+env: {'LESS': '-R', 'LC_CTYPE': 'UTF-8', 'TERM_PROGRAM_VERSION': '343.7', 'LESSOPEN': '|pygmentize -g %s', 'LOGNAME': 'anas', 'USER': 'anas', 'HOME': '/Users/anas', 'PATH': '/Users/anas/python/diastema/.tox/py27/bin:/Library/Frameworks/Python.framework/Versions/2.7/bin:/usr/local/mysql/bin:/usr/local/lib:/usr/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Library/TeX/texbin', 'VIRTUALENVWRAPPER_SCRIPT': '/usr/local/bin/virtualenvwrapper.sh', 'DISPLAY': '/private/tmp/com.apple.launchd.06pH0l3rln/org.macosforge.xquartz:0', 'TERM_PROGRAM': 'Apple_Terminal', 'LANG': 'en_US.UTF-8', 'TERM': 'xterm-256color', 'SHELL': '/bin/bash', 'SHLVL': '1', 'XPC_FLAGS': '0x0', 'PYTHONHASHSEED': '44134301', 'TMPDIR': '/var/folders/vb/fj0rzzf16dg832ld98cdg63m0000gn/T/', 'WORKON_HOME': '/Users/anas/.virtualenvs', 'TERM_SESSION_ID': '44F725A3-954A-4394-9B6B-1427EDEC8AFF', 'XPC_SERVICE_NAME': '0', 'SSH_AUTH_SOCK': '/private/tmp/com.apple.launchd.vW6bHZBpsr/Listeners', 'VIRTUAL_ENV': '/Users/anas/python/diastema/.tox/py27', 'Apple_PubSub_Socket_Render': '/private/tmp/com.apple.launchd.8U8T1KC2i7/Render', 'LC_ALL': 'en_US.UTF-8', '_': '/Library/Frameworks/Python.framework/Versions/2.7/bin/tox', 'VIRTUALENVWRAPPER_PROJECT_FILENAME': '.project', 'LSCOLORS': 'exfxcxdxbxegedabagacad', 'VIRTUALENVWRAPPER_HOOK_DIR': '/Users/anas/.virtualenvs', 'OLDPWD': '/Users/anas/python', 'OPENNI2_REDIST': '/usr/local/lib/ni2', 'CLICOLOR': '1', '__CF_USER_TEXT_ENCODING': '0x1F5:0x0:0x1', 'PWD': '/Users/anas/python/diastema', 'OPENNI2_INCLUDE': '/usr/local/include/ni2'}
+
+You are using pip version 6.0.6, however version 7.1.0 is available.
+You should consider upgrading via the 'pip install --upgrade pip' command.
+Processing ./.tox/dist/diastema-0.0.4.zip
+Collecting numpy (from diastema==0.0.4)
+  Downloading numpy-1.9.2-cp27-none-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl (3.7MB)
+Collecting matplotlib (from diastema==0.0.4)
+  Using cached matplotlib-1.4.3-cp27-none-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl
+Collecting six>=1.4 (from matplotlib->diastema==0.0.4)
+  Downloading six-1.9.0-py2.py3-none-any.whl
+Collecting mock (from matplotlib->diastema==0.0.4)
+  Downloading mock-1.3.0-py2.py3-none-any.whl (56kB)
+Collecting pytz (from matplotlib->diastema==0.0.4)
+  Downloading pytz-2015.4-py2.py3-none-any.whl (475kB)
+Collecting python-dateutil (from matplotlib->diastema==0.0.4)
+  Using cached python_dateutil-2.4.2-py2.py3-none-any.whl
+Collecting nose>=0.11.1 (from matplotlib->diastema==0.0.4)
+  Downloading nose-1.3.7-py2-none-any.whl (154kB)
+Collecting pyparsing!=2.0.0,>=1.5.6 (from matplotlib->diastema==0.0.4)
+  Using cached pyparsing-2.0.3-py2.py3-none-any.whl
+Collecting funcsigs (from mock->matplotlib->diastema==0.0.4)
+  Downloading funcsigs-0.4-py2.py3-none-any.whl
+Collecting pbr>=0.11 (from mock->matplotlib->diastema==0.0.4)
+  Downloading pbr-1.5.0-py2.py3-none-any.whl (87kB)
+Installing collected packages: pbr, funcsigs, pyparsing, nose, python-dateutil, pytz, mock, six, diastema, matplotlib, numpy
+
+
+
+
+
+
+
+
+  Running setup.py install for diastema
+
+
+Successfully installed diastema-0.0.4 funcsigs-0.4 matplotlib-1.4.3 mock-1.3.0 nose-1.3.7 numpy-1.9.2 pbr-1.5.0 pyparsing-2.0.3 python-dateutil-2.4.2 pytz-2015.4 six-1.9.0
